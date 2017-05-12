@@ -15045,7 +15045,8 @@ var _redux = __webpack_require__(47);
 
 var rootReducer = (0, _redux.combineReducers)({
   auth: __webpack_require__(37).default,
-  bands: __webpack_require__(320).default
+  bands: __webpack_require__(320).default,
+  creator: __webpack_require__(321).default
 });
 
 exports.default = rootReducer;
@@ -32594,6 +32595,259 @@ var deleteBand = exports.deleteBand = function deleteBand(bandId) {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.closeModal = exports.addBand = exports.loadNewBand = exports.editCustomMember = exports.addCustomMember = exports.loadColorList = exports.handlePublicStatus = exports.handleBandName = exports.checkBandName = exports.setColorList = exports.setPublicStatus = exports.setCurrentBandName = exports.setCurrentMember = exports.setNewMembers = exports.setNewMemberName = exports.setNewMemberColor = exports.setNewBand = exports.setModal = exports.setAlert = undefined;
+exports.default = reducer;
+
+var _axios = __webpack_require__(140);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _reactRouter = __webpack_require__(139);
+
+var _utils = __webpack_require__(330);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/* ------------------   ACTIONS   ------------------ */
+
+var SET_NEW_BAND = 'SET_NEW_BAND';
+var SET_NEW_MEMBER_COLOR = 'SET_NEW_MEMBER_COLOR';
+var SET_NEW_MEMBER_NAME = 'SET_NEW_MEMBER_NAME';
+var SET_NEW_MEMBERS = 'SET_NEW_MEMBERS';
+var SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER';
+var SET_CURRENT_BAND_NAME = 'SET_CURRENT_BAND_NAME';
+var SET_PUBLIC_STATUS = 'SET_PUBLIC_STATUS';
+var SET_COLOR_LIST = 'SET_COLOR_LIST';
+
+/* --------------   ACTION CREATORS   -------------- */
+
+var setAlert = exports.setAlert = function setAlert(message) {
+	return { type: SET_ALERT, message: message };
+};
+var setModal = exports.setModal = function setModal(message) {
+	return { type: SET_MODAL, message: message };
+};
+var setNewBand = exports.setNewBand = function setNewBand(band) {
+	return { type: SET_NEW_BAND, band: band };
+};
+var setNewMemberColor = exports.setNewMemberColor = function setNewMemberColor(color) {
+	return { type: SET_NEW_MEMBER_COLOR, color: color };
+};
+var setNewMemberName = exports.setNewMemberName = function setNewMemberName(name) {
+	return { type: SET_NEW_MEMBER_NAME, name: name };
+};
+var setNewMembers = exports.setNewMembers = function setNewMembers(members) {
+	return { type: SET_NEW_MEMBERS, members: members };
+};
+var setCurrentMember = exports.setCurrentMember = function setCurrentMember(member) {
+	return { type: SET_CURRENT_MEMBER, member: member };
+};
+var setCurrentBandName = exports.setCurrentBandName = function setCurrentBandName(bandName) {
+	return { type: SET_CURRENT_BAND_NAME, bandName: bandName };
+};
+var setPublicStatus = exports.setPublicStatus = function setPublicStatus(status) {
+	return { type: SET_PUBLIC_STATUS, status: status };
+};
+var setColorList = exports.setColorList = function setColorList(list) {
+	return { type: SET_COLOR_LIST, list: list };
+};
+
+/* -----------------   REDUCERS   ------------------ */
+
+var initialState = {
+	newBand: {},
+	newBandName: '',
+	newMembers: [],
+	newMemberName: '',
+	newMemberColor: '',
+	publicStatus: true,
+	colorList: [],
+	alert: '',
+	modalMessage: ''
+};
+
+function reducer() {
+	var prevState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+	var action = arguments[1];
+
+
+	var newState = Object.assign({}, prevState);
+
+	switch (action.type) {
+
+		case SET_NEW_BAND:
+			newState.newBand = action.band;
+			break;
+
+		case SET_CURRENT_BAND_NAME:
+			newState.newBandName = action.bandName;
+			break;
+
+		case SET_NEW_MEMBER_COLOR:
+			newState.newMemberColor = action.color;
+			break;
+
+		case SET_NEW_MEMBER_NAME:
+			newState.newMemberName = action.name;
+			break;
+
+		case SET_NEW_MEMBERS:
+			newState.newMembers = action.members;
+			break;
+
+		case SET_CURRENT_MEMBER:
+			newState.newMember = action.member;
+			break;
+
+		case SET_PUBLIC_STATUS:
+			newState.publicStatus = action.status;
+			break;
+
+		case SET_COLOR_LIST:
+			newState.colorList = action.list;
+			break;
+
+		default:
+			return prevState;
+
+	}
+
+	return newState;
+}
+
+/* ---------------   DISPATCHERS   ----------------- */
+
+/* Check if band has been previously created */
+var checkBandName = exports.checkBandName = function checkBandName(bandName) {
+	return function (dispatch, getState) {
+		var bands = getState().bands.allBands.map(function (band) {
+			return band.name.toLowerCase().replace(/\s/g, '');
+		});
+		var typedName = bandName.toLowerCase().replace(/\s/g, '');
+		if (bands.indexOf(typedName) !== -1) {
+			return dispatch(setAlert(bandName + ' already exists in the database. Please, search for this band and add it to your favorites instead of creating a duplicate.'));
+		} else {
+			return dispatch(setAlert(''));
+		}
+	};
+};
+
+var handleBandName = exports.handleBandName = function handleBandName(bandName) {
+	return function (dispatch) {
+		return dispatch(setCurrentBandName(bandName));
+	};
+};
+
+var handlePublicStatus = exports.handlePublicStatus = function handlePublicStatus(status) {
+	return function (dispatch, getState) {
+		status = getState().creator.publicStatus ? false : true;
+		return dispatch(setPublicStatus(status));
+	};
+};
+
+/* Remove colors used by created members */
+var loadColorList = exports.loadColorList = function loadColorList() {
+	return function (dispatch, getState) {
+		var newMembers = getState().creator.newMembers;
+		var usedColors = [];
+		if (newMembers.length > 0) {
+			usedColors = newMembers.map(function (member) {
+				return member.color;
+			});
+		}
+		dispatch(setColorList((0, _utils.filterColors)(usedColors)));
+	};
+};
+
+var addCustomMember = exports.addCustomMember = function addCustomMember() {
+	return function (dispatch, getState) {
+		var member = {
+			name: getState().creator.newMemberName,
+			color: getState().creator.newMemberColor
+		};
+		var newMembers = [].concat(_toConsumableArray(getState().creator.newMembers));
+		var index = newMembers.findIndex(function (el) {
+			return el.name === member.name;
+		});
+
+		// Assign random name, if member doesn't have one;
+		if (!member.name) {
+			member.name = 'Member ' + (newMembers.length + 1);
+		}
+
+		// Assign random color, if member doesn't have one
+		if (!member.color) {
+			var availableColors = getState().creator.colorList;
+			member.color = availableColors[Math.floor(Math.random() * availableColors.length)];
+		}
+
+		// Add or update to array
+		if (index === -1) newMembers.push(member);else newMembers[index] = member;
+		loadColorList();
+		dispatch(setNewMemberName(''));
+		dispatch(setNewMemberColor(''));
+		dispatch(setNewMembers(newMembers));
+	};
+};
+
+var editCustomMember = exports.editCustomMember = function editCustomMember(member) {
+	return function (dispatch) {
+		dispatch(setNewMemberName(member.name));
+		dispatch(setNewMemberColor(member.color));
+	};
+};
+
+var loadNewBand = exports.loadNewBand = function loadNewBand() {
+	return function (dispatch, getState) {
+		var band = getState().bands.currentBand;
+		if (band.id) {
+			return dispatch(setPublicStatus(band.publicStatus));
+		}
+	};
+};
+
+var addBand = exports.addBand = function addBand() {
+	return function (dispatch, getState) {
+		console.log('Submit');
+		var bandName = getState().creator.newBandName;
+		var bandStatus = getState().creator.publicStatus;
+		var members = getState().creator.newMembers;
+		var userId = getState().auth.id;
+
+		if (bandName === '') {
+			return dispatch(setModal('Your band must have a name.'));
+		}
+		if (members.length < 2) {
+			return dispatch(setModal('Your band must have at least 2 members'));
+		}
+
+		var bandToAdd = {
+			user_id: userId,
+			original_creator_id: userId,
+			name: bandName,
+			public: bandStatus,
+			members: members
+		};
+
+		return _axios2.default.post('/api/bands', bandToAdd).then(function () {
+			console.log('Band created');
+			_reactRouter.browserHistory.push('/myBands');
+		});
+	};
+};
+
+var closeModal = exports.closeModal = function closeModal() {
+	return function (dispatch) {
+		console.log('CLOSE');
+		return dispatch(setModal(''));
+	};
+};
+
 /***/ }),
 /* 322 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -32635,12 +32889,99 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps)(_App2.default);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(49);
+
+var _CreateBand = __webpack_require__(337);
+
+var _CreateBand2 = _interopRequireDefault(_CreateBand);
+
+var _creator = __webpack_require__(321);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    user: state.auth,
+    alert: state.creator.alert,
+    currentBand: state.bands.currentBand,
+    colorList: state.creator.colorList,
+    newBand: state.creator.newBand,
+    newBandName: state.creator.newBandName,
+    newMembers: state.creator.newMembers,
+    newMember: state.creator.newMember,
+    newMemberName: state.creator.newMemberName,
+    newMemberColor: state.creator.newMemberColor,
+    publicStatus: state.creator.publicStatus,
+    modalMessage: state.creator.modalMessage
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return {
+    checkBandName: function checkBandName(event) {
+      return dispatch((0, _creator.checkBandName)(event.target.value));
+    },
+    handleBandName: function handleBandName(event) {
+      return dispatch((0, _creator.handleBandName)(event.target.value));
+    },
+    handleMemberName: function handleMemberName(event) {
+      return dispatch((0, _creator.setNewMemberName)(event.target.value));
+    },
+    handleMemberColor: function handleMemberColor(color) {
+      return dispatch((0, _creator.setNewMemberColor)(color));
+    },
+    addCustomMember: function addCustomMember() {
+      dispatch((0, _creator.addCustomMember)());
+      dispatch((0, _creator.loadColorList)());
+    },
+    editCustomMember: function editCustomMember(member) {
+      return dispatch((0, _creator.editCustomMember)(member));
+    },
+    handlePublicStatus: function handlePublicStatus(event) {
+      return dispatch((0, _creator.handlePublicStatus)(event.target.value));
+    },
+    handleSubmit: function handleSubmit() {
+      return dispatch((0, _creator.addBand)());
+    },
+    closeModal: function closeModal() {
+      return dispatch((0, _creator.closeModal)());
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_CreateBand2.default);
+
 /***/ }),
 /* 325 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(49);
+
+var _Distribute = __webpack_require__(340);
+
+var _Distribute2 = _interopRequireDefault(_Distribute);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapState = function mapState(state) {
+  return {
+    user: state.auth,
+    currentBand: state.bands.currentBand
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapState)(_Distribute2.default);
 
 /***/ }),
 /* 326 */
@@ -32719,6 +33060,26 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(49);
+
+var _Profile = __webpack_require__(341);
+
+var _Profile2 = _interopRequireDefault(_Profile);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapState = function mapState(state) {
+  return {
+    user: state.auth
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapState)(_Profile2.default);
+
 /***/ }),
 /* 329 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -32726,8 +33087,46 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(49);
+
+var _Search = __webpack_require__(342);
+
+var _Search2 = _interopRequireDefault(_Search);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapState = function mapState(state) {
+  return {
+    user: state.auth
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapState)(_Search2.default);
+
 /***/ }),
-/* 330 */,
+/* 330 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var filterColors = exports.filterColors = function filterColors() {
+  var used = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+  var colorList = ['white', 'black', 'red', 'tomato', 'peach', 'pale', 'dirt', 'brown', 'orange', 'gold', 'yellow', 'yellowGreen', 'olive', 'green', 'darkGreen', 'springGreen', 'forest', 'teal', 'cyan', 'blue', 'navy', 'violet', 'blueViolet', 'purple', 'redViolet', 'pink', 'hotPink', 'grey', 'silver', 'darkGrey'];
+  return colorList.filter(function (color) {
+    return used.indexOf(color) === -1;
+  });
+};
+
+/***/ }),
 /* 331 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -33300,6 +33699,255 @@ var MyBands = function MyBands(_ref) {
 };
 
 exports.default = MyBands;
+
+/***/ }),
+/* 337 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(8);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _PopUpAlert = __webpack_require__(343);
+
+var _PopUpAlert2 = _interopRequireDefault(_PopUpAlert);
+
+var _Modal = __webpack_require__(339);
+
+var _Modal2 = _interopRequireDefault(_Modal);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var CreateBand = function CreateBand(_ref) {
+  var newBandName = _ref.newBandName,
+      newMembers = _ref.newMembers,
+      newMemberName = _ref.newMemberName,
+      newMemberColor = _ref.newMemberColor,
+      publicStatus = _ref.publicStatus,
+      colorList = _ref.colorList,
+      handlePublicStatus = _ref.handlePublicStatus,
+      modalMessage = _ref.modalMessage,
+      checkBandName = _ref.checkBandName,
+      handleMemberName = _ref.handleMemberName,
+      handleMemberColor = _ref.handleMemberColor,
+      addCustomMember = _ref.addCustomMember,
+      editCustomMember = _ref.editCustomMember,
+      removeCustomMember = _ref.removeCustomMember,
+      alert = _ref.alert,
+      handleBandName = _ref.handleBandName,
+      handleSubmit = _ref.handleSubmit;
+
+
+  return _react2.default.createElement(
+    'div',
+    { className: 'row creator' },
+    _react2.default.createElement(_Modal2.default, { message: modalMessage }),
+    _react2.default.createElement(
+      'div',
+      { className: 'row-container' },
+      _react2.default.createElement(
+        'h2',
+        null,
+        'Create Band'
+      ),
+      _react2.default.createElement('input', { className: 'textfield', type: 'text', name: 'setname', placeholder: 'Define Band Name', onChange: handleBandName, onBlur: function onBlur(event) {
+          return checkBandName(event);
+        } }),
+      _react2.default.createElement('br', null),
+      alert ? _react2.default.createElement(_PopUpAlert2.default, { message: alert }) : null,
+      _react2.default.createElement(
+        'div',
+        { className: 'public-status' },
+        _react2.default.createElement('input', { type: 'checkbox', checked: publicStatus, name: 'public', onChange: handlePublicStatus }),
+        ' Public'
+      ),
+      _react2.default.createElement('hr', null),
+      _react2.default.createElement('input', { className: 'textfield', type: 'text', name: 'membername', placeholder: 'Add Member Name', value: newMemberName, maxLength: '15', onChange: handleMemberName }),
+      _react2.default.createElement(
+        'p',
+        null,
+        'Member Color:'
+      ),
+      _react2.default.createElement(
+        'div',
+        { className: 'color-picker' },
+        colorList.map(function (color) {
+          return _react2.default.createElement('div', { key: color, className: newMemberColor === color ? 'box box-selected color-' + color : 'box color-' + color, onClick: function onClick() {
+              return handleMemberColor(color);
+            } });
+        })
+      ),
+      newMembers.length < 20 ? _react2.default.createElement(
+        'button',
+        { className: 'btn btn-lg-mobile', type: 'submit', onClick: function onClick() {
+            return addCustomMember();
+          } },
+        'Add Member'
+      ) : null,
+      _react2.default.createElement('hr', null),
+      _react2.default.createElement(
+        'h3',
+        null,
+        'Members\' List (',
+        _react2.default.createElement(
+          'span',
+          null,
+          newMembers.length
+        ),
+        ' of 20)'
+      ),
+      _react2.default.createElement(
+        'p',
+        { className: 'text-details' },
+        _react2.default.createElement(
+          'small',
+          null,
+          '(To edit a member, click on its name.)'
+        )
+      ),
+      _react2.default.createElement(
+        'ul',
+        { className: 'members-list' },
+        newMembers && newMembers.map(function (member) {
+          return _react2.default.createElement(
+            'li',
+            { key: member.name, className: 'btn-mini color-' + member.color, type: 'button', onClick: function onClick() {
+                return editCustomMember(member);
+              } },
+            member.name
+          );
+        })
+      ),
+      _react2.default.createElement('hr', null),
+      _react2.default.createElement(
+        'button',
+        { className: 'btn btn-lg-mobile', onClick: function onClick() {
+            return handleSubmit();
+          } },
+        'Save Set'
+      )
+    )
+  );
+};
+
+exports.default = CreateBand;
+
+/***/ }),
+/* 338 */,
+/* 339 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(8);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _creator = __webpack_require__(321);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Modal = function Modal(_ref) {
+  var message = _ref.message;
+
+  return _react2.default.createElement(
+    'div',
+    null,
+    message ? _react2.default.createElement(
+      'div',
+      { className: 'modal' },
+      _react2.default.createElement(
+        'div',
+        { className: 'modal-content' },
+        _react2.default.createElement(
+          'p',
+          null,
+          message
+        ),
+        _react2.default.createElement(
+          'button',
+          { className: 'btn btn-20', onClick: function onClick() {
+              return (0, _creator.closeModal)();
+            } },
+          'OK'
+        )
+      )
+    ) : null
+  );
+};
+
+exports.default = Modal;
+
+/***/ }),
+/* 340 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/***/ }),
+/* 341 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/***/ }),
+/* 342 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/***/ }),
+/* 343 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(8);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Alert = function Alert(_ref) {
+  var message = _ref.message;
+
+  return _react2.default.createElement(
+    "div",
+    { className: "alert" },
+    _react2.default.createElement(
+      "span",
+      { className: "close" },
+      "x"
+    ),
+    _react2.default.createElement(
+      "p",
+      { className: "content" },
+      message
+    )
+  );
+};
+
+exports.default = Alert;
 
 /***/ })
 /******/ ]);
