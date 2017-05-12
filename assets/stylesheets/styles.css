@@ -1,0 +1,551 @@
+/* HTML5 BOILERPLATE */
+
+$primary: #222222;
+$primary-medium: #434343;
+$primary-light: #656565;
+
+$medium: #868686;
+
+$negative: #EAEAEA;
+$negative-medium: #C9C9C9;
+$negative-dark: #A7A7A7;
+
+$white: #FFFFFF;
+
+$alert: #868471;
+$danger: #866b66;
+$focus: #757A86;
+
+html {
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+::-moz-selection {
+  background: $focus;
+  text-shadow: none;
+}
+
+::selection {
+  background: $focus;
+  text-shadow: none;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid $negative-medium;
+  margin: 10px auto;
+  padding: 0;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+* img {
+  max-width:100%;
+  height: auto;
+}
+
+ul, li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+*:focus {
+    outline: none;
+}
+
+/* CROSS-BROWSWER COMPATIBILITY */
+
+@mixin outline($color) {
+	outline: 1px solid $color;
+}
+
+@mixin border-radius($radius: 5px, $radius-r: $radius, $radius-b: $radius, $radius-l: $radius) {
+  -webkit-border-radius: $radius $radius-r $radius-b $radius-l;
+     -moz-border-radius: $radius $radius-r $radius-b $radius-l;
+      -ms-border-radius: $radius $radius-r $radius-b $radius-l;
+          border-radius: $radius $radius-r $radius-b $radius-l;
+}
+
+/* BOXES COLOR PALETTE */
+
+$colorList: peach, tomato, pale, dirt, orange, brown, yellow, gold, yellowGreen, olive, green, darkGreen, springGreen, forest, teal, cyan, blue, navy, violet, blueViolet, purple, redViolet, pink, hotPink, red, grey, silver, darkGrey, white, black;
+$colorCodes: #ffa07a, #ff6347, #d2b48c, #948271, #ff8e2a, #8b4513, #ffe400, #b8850b, #ccff26, #808000, #7fb817, #355423, #59ff84, #008000, #15aa98, #39badd, #406fff, #1f4c75, #a177ef, #7b68ee, #9e35ae, #9c1465, #fc6be9, #e62e8a, #d01f3c, #a6a89d, #777278, #414549, #f2f2f2, #262f31;
+
+/* ==========================================================================
+   Page
+   ========================================================================== */
+
+body {
+  background: #000;
+  padding: 10px;
+}
+
+.container {
+  width: 100%;
+  height: calc(100vh - 20px);
+  background: $negative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  @include border-radius(10px);
+
+  &.scrollable {
+    overflow: auto;
+  }
+}
+
+.row {
+  width: 100%;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.scrollable {
+  overflow: auto;
+}
+
+.row-container {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.only-mobile {
+  display: none;
+}
+
+.active {
+  background: #DDDDDD !important;
+  font-style: italic;
+}
+
+header {
+  width: 100%;
+  border-bottom: 1px solid $negative-medium;
+
+  .nav {
+    display: flex;
+    justify-content: space-around;
+
+    a {
+      flex-grow: 1;
+      text-transform: uppercase;
+      padding: 10px;
+      color: #333;
+      text-decoration: none;
+
+      &:hover {
+        background: $white;
+        @include border-radius(10px, 10px, 0, 0);
+      }
+    }
+  }
+}
+
+.span-box {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  @include border-radius(2px);
+  padding: 3px;
+  border: 1px solid $primary;
+  border-top: 10px solid $primary;
+  font-size: 80%;
+
+  .content {
+    margin: 0;
+  }
+}
+
+.alert {
+  @extend .span-box;
+  border-color: $alert;
+  padding-right: 9px;
+  
+  .close {
+    float: right;
+    color: $alert;
+    font-size: 120%;
+
+    &:hover {
+      color: $white;
+    }
+  }
+}
+
+.tutorial {
+  @extend .span-box;
+  border-color: $focus;
+}
+
+.warning {
+  @extend .span-box;
+  border-color: $danger;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .logo {
+    width: 25%;
+    padding: 2px;
+  }
+
+  .login-form {
+    input[type=text], input[type=password] {
+      background: $white;
+      padding: 5px;
+      margin-right: 5px;
+      border: 1px inset #DDDDDD;
+      @include border-radius(5px);
+    }
+  }
+
+  a {
+    color: $primary;
+    margin-top: 10px;
+    font-size: 80%;
+
+    &:visited {
+      color: $primary;
+    }
+  }
+}
+
+.btn {
+  align-items: flex-start;
+  text-align: center;
+  color: #000;
+  background-color: $white;
+  padding: 5px;
+  border: 1px outset #DDDDDD;
+  border-radius: 5px;
+  margin: 0 5px;
+
+  &:hover {
+    background: #DED5E0 !important;
+  }
+
+  &.on {
+    border: 2px solid #d01131;
+  }
+}
+
+.btn-center {
+  margin: 0 auto;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-icon {
+  padding: 5px;
+}
+
+.btn-mini {
+  text-align: center;
+  color: #000;
+  background-color: $white;
+  padding: 0 3px;
+  border: 1px solid #666;
+  margin: 3px;
+  width: 10%;
+  @include border-radius(3px);
+}
+
+.btn-mini:hover {
+  background: $white !important;
+  cursor: pointer;
+}
+
+.btn-20 {
+  min-width: 20%;
+}
+
+/* CREATOR */
+
+.creator {
+  p {
+    margin: 10px auto;
+  }
+
+  .textfield {
+    font-size: 90%;
+    width: 100%;
+    text-align: center;
+    background: #F2F2F2;
+    padding: 5px;
+    border: 1px inset #DDDDDD;
+    @include border-radius(5px);
+  }
+
+  .public-status {
+    margin-top: 10px;
+  }
+}
+
+.members-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 10px;
+}
+
+/* COLORS */
+
+@for $i from 1 through length($colorList) {
+  .color-#{nth($colorList, $i)} {
+    background-color: #{nth($colorCodes, $i)} !important;
+  }
+}
+
+.color-black, .color-darkGrey {
+  color: $white !important;
+}
+
+
+/* COLOR PICKER */
+
+.color-picker {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  .box {
+    border: 1px solid $medium;
+    width: calc((100% / 15) - 10px);
+    height: 40px;
+    margin: 5px;
+    cursor: pointer;
+    @include border-radius(3px);
+
+    &:hover {
+      border: 2px solid #fff;
+    }
+  }
+
+  .box-selected {
+    border: 4px solid $primary !important;
+  }
+}
+
+.h2-count {
+  font-size: 70%;
+  font-weight: normal;
+}
+
+/* TABLES */
+
+table {
+  font-size: 80%;
+  width: 100%;
+  margin: 0 auto;
+  border-spacing: 2.5rem;
+
+  th {
+    background: $medium;
+    padding: 3px 10px;
+  }
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background: $negative-medium;
+      }
+      td {
+        padding: 3px 10px;
+        border-left: 1px solid $negative;
+      }
+
+      &:hover {
+        background: $white;
+      }
+    }  
+  }
+
+}
+
+/* DISTRIBUTE */
+
+.distribute {
+  width: 100%;
+  .row-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  h2 {
+    margin: 20px 0;
+  }
+
+  .change-band {
+    font-weight: normal;
+    font-size: 60%;
+    text-decoration: underline;
+  }
+
+  nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+
+    button {
+      width: 18%;
+      font-size: 90%;
+      margin: 0 !important;
+    }
+  }
+
+  .who {
+    margin: 10px 0;
+    background-color: $negative;
+    font-size: 90%;
+    border: 1px solid $negative-medium;
+    @include border-radius(3px);   
+  }
+
+  .log {
+    padding: 5px;
+    font-size: 80%;
+    @extend .who;
+    a {
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      &:before {
+        content: ' ';
+      }
+      &:after {
+        content: ' |';
+      }
+      &:last-child:after {
+        content: '';
+      }
+    }
+  }
+}
+
+/* PROGRESS */
+
+.progress {
+
+  width: 100%;
+  margin: 5px 0;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  @include border-radius(4px);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  display: flex;
+
+  .bar {
+    float: left;
+    width: 0px;
+    height: 20px;
+  }
+}
+
+@for $i from 1 through 100 {
+  .w-#{$i} { 
+    width: $i * 1% !important;
+  }
+}
+
+/* BOXES */
+
+.boxes {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.box {
+  background: #666;
+  margin: 5px 0;
+  padding: 5px;
+  @include border-radius(10px);
+  color: #000;
+  font-size: 1.5em;
+  cursor: pointer;
+
+  font-size: 90%;
+}
+
+.box-key {
+  border: 1px solid rgba(255,255,255,0.2);
+  @include border-radius(3px);
+  background: rgba(255,255,255,0.3);
+  padding: 1px 5px;
+}
+
+.box-name {
+  text-transform: uppercase;
+  line-height: 30px;
+}
+
+.box-lg {
+  width: 43%;
+}
+
+.box-md {
+  width: 31%;
+}
+
+.box-sm {
+  width: 23%;
+}
+
+.box-xs {
+  width: 18%;
+}
+
+.user-information {
+  text-align: left;
+}
+
+.modal {
+  background: rgba(0,0,0,.9);
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .modal-content {
+    background: $white;
+    width: 80%;
+    padding: 20px;
+    @include border-radius(5px);
+  }
+}

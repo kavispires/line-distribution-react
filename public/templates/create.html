@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta id="format-detection" content="telephone=no" />
+  <meta id="msapplication-tap-highlight" content="no" />
+  <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+  <title>Line Distribution</title>
+
+  <link rel="stylesheet" href="../css/normalize.min.css">
+  <link rel="stylesheet" href="../fonts/icons.css">
+  <link rel="stylesheet" href="../css/styles.css">
+
+  <link rel="icon" href="../favicon.png">
+
+</head>
+<body>
+  <div id="main">
+    <div class="container">
+
+      <div class="modal">
+        <div class="modal-content">
+          <p>Message comes here.<p>
+          <button class="btn">OK</button>
+        </div>  
+      </div>
+
+      <header>
+        <ul class="nav">
+          <a href="profile.html">
+            <span class="icon-user" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Profile</span>
+          </a>
+          <a href="mybands.html">
+            <span class="icon-sets" />
+            <br class="only-mobile" />
+            <span class="menu-text"> My Bands</span>
+          </a>
+          <a href="distribute.html">
+            <span class="icon-bar-chart" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Distribute</span>
+          </a>
+          <a href="search.html">
+            <span class="icon-search" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Search</span>
+          </a>
+        </ul>
+      </header>
+
+      <section class="row creator scrollable">
+        <div class="row-container">
+          <h2>Create Band</h2>
+          <input class="textfield" type="text" name="setname" placeholder="Define Band Name" onChange={handleBandName} /><br />
+          <div class="public-status">
+            <input type="checkbox" checked={publicStatus} name="public" onChange={handlePublicStatus} /> Public
+          </div>
+          <hr>
+          <input class="textfield" type="text" name="membername" placeholder="Add Member Name" maxLength="15" onChange={handleMemberName} />
+          <p>Member Color:</p>
+          <div class="color-picker">
+            <div class="box color-white"></div>
+            <div class="box color-black"></div>
+            <div class="box color-red"></div>
+            <div class="box color-tomato"></div>
+            <div class="box color-peach"></div>
+            <div class="box color-pale"></div>
+            <div class="box color-dirt"></div>
+            <div class="box color-brown"></div>
+            <div class="box color-orange"></div>
+            <div class="box color-gold"></div>
+            <div class="box color-yellow"></div>
+            <div class="box color-yellowGreen"></div>
+            <div class="box color-olive"></div>
+            <div class="box color-green"></div>
+            <div class="box color-darkGreen"></div>
+            <div class="box color-springGreen"></div>
+            <div class="box color-forest"></div>
+            <div class="box color-teal"></div>
+            <div class="box color-cyan"></div>
+            <div class="box color-blue"></div>
+            <div class="box color-navy"></div>
+            <div class="box color-violet"></div>
+            <div class="box color-blueViolet"></div>
+            <div class="box color-purple"></div>
+            <div class="box color-redViolet"></div>
+            <div class="box color-pink"></div>
+            <div class="box color-hotPink"></div>
+            <div class="box color-grey"></div>
+            <div class="box color-silver"></div>
+            <div class="box color-darkGrey"></div>
+          </div>
+          <button class="btn btn-lg-mobile" type="submit">Add Member</button>
+          <button class="btn btn-lg-mobile" type="button">Remove Member</button>
+          <hr>
+          <h3>Members' List (<span>1</span> of 20)</h3>
+          <p class="text-details"><small>(To edit a member, click on its name.)</small></p>
+          <ul class="members-list">
+              <li class="btn-mini color-navy" type="button">member 1</li>
+              <li class="btn-mini color-blue" type="button">member 2</li>
+              <li class="btn-mini color-red" type="button">member 3</li>
+              <li class="btn-mini color-silver" type="button">member 4</li>
+              <li class="btn-mini color-violet" type="button">cudeflededison</li>
+          </ul>
+          <hr>
+          <button class="btn btn-lg-mobile" type="button">Confirm Set</button>   
+        </div>
+      </section>
+    </div>
+  </div>
+</div> <!-- /main -->
+<script async defer src=/bundle.js></script>    
+</body>
+</html> 

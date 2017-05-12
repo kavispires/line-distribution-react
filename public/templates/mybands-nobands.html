@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta id="format-detection" content="telephone=no" />
+  <meta id="msapplication-tap-highlight" content="no" />
+  <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+  <title>Line Distribution</title>
+
+  <link rel="stylesheet" href="../css/normalize.min.css">
+  <link rel="stylesheet" href="../fonts/icons.css">
+  <link rel="stylesheet" href="../css/styles.css">
+
+  <link rel="icon" href="../favicon.png">
+
+</head>
+<body>
+  <div id="main">
+    <div class="container">
+      <header>
+        <ul class="nav">
+          <a href="profile.html">
+            <span class="icon-user" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Profile</span>
+          </a>
+          <a href="mybands.html">
+            <span class="icon-sets" />
+            <br class="only-mobile" />
+            <span class="menu-text"> My Bands</span>
+          </a>
+          <a href="distribute.html">
+            <span class="icon-bar-chart" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Distribute</span>
+          </a>
+          <a href="search.html">
+            <span class="icon-search" />
+            <br class="only-mobile" />
+            <span class="menu-text"> Search</span>
+          </a>
+        </ul>
+      </header>
+
+      <div class="row scrollable">
+        <div class="row-container">
+          <h1>My Bands</h1>
+          <p>Here you can create a new band, see your custom bands and the bands you favorited</p>
+          <button class="btn btn-center">Create New Band</button>
+          <hr>
+          <h2>Custom Bands <span class="h2-count">(0)</span></h2>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Members</th>
+                <th>Public</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6">No Custom Bands available.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p><small>If you delete your public custom bands, your creator credit will be removed, but the band will still be available in the search box for other users.</small></p>
+
+          <h2>Favorite Bands <span class="h2-count">(0)</span></h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Members</th>
+                <th>Distributions</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5">No Favorite Bands available.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p><small>You will always have access to the public bands, unless the administrator have removed them.</small></p>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- /main -->
+<script async defer src=/bundle.js></script>    
+</body>
+</html> 
