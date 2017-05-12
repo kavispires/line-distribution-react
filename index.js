@@ -1,9 +1,9 @@
-'use strict'
+'use strict';
 
-const {resolve} = require('path')
-const chalk = require('chalk')
-const pkg = require('./package.json')
-const debug = require('debug')(`${pkg.name}:boot`)
+const {resolve} = require('path');
+const chalk = require('chalk');
+const pkg = require('./package.json');
+const debug = require('debug')(`${pkg.name}:boot`);
 
 const nameError =
 `*******************************************************************
@@ -17,12 +17,12 @@ isn't valid. If you don't change it, things won't work right.
 
 Please change it in ${__dirname}/package.json
   ~ xoxo, bones
-********************************************************************`
+********************************************************************`;
 
-const reasonableName = /^[a-z0-9\-_]+$/
+const reasonableName = /^[a-z0-9\-_]+$/;
 // RegExp.text docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test
 if (!reasonableName.test(pkg.name)) {
-  console.error(chalk.red(nameError))
+  console.error(chalk.red(nameError));
 }
 
 // This will load a secrets file from
@@ -33,28 +33,37 @@ if (!reasonableName.test(pkg.name)) {
 // and add it to the environment.
 // Note that this needs to be in your home directory, not the project's root directory
 const env = Object.create(process.env)
-  , secretsFile = resolve(env.HOME, `.${pkg.name}.env`)
+    , secretsFile = resolve(require('homedir')(), `.${pkg.name}.env`);
+
 try {
-  Object.assign(env, require(secretsFile))
+  const additionalEnv = require(secretsFile);
+  Object.assign(env, additionalEnv);
+  process.env = env;
+  debug('%s: %j', secretsFile, additionalEnv);
 } catch (error) {
-  debug('%s: %s', secretsFile, error.message)
-  debug('%s: env file not found or invalid, moving on', secretsFile)
+  debug('%s: %s', secretsFile, error.message);
+  debug('%s: env file not found or invalid, moving on', secretsFile);
 }
 
-const PORT = process.env.PORT || 1337
-
 module.exports = {
-  get name() { return pkg.name },
-  get isTesting() { return !!global.it },
+  get name() { return pkg.name; },
+  get isTesting() { return !!global.it; },
   get isProduction() {
-    return process.env.NODE_ENV === 'production'
+    return env.NODE_ENV === 'production';
+  },
+  get isDevelopment() {
+    return env.NODE_ENV === 'development';
   },
   get baseUrl() {
-    return env.BASE_URL || `http://localhost:${PORT}`
+    return env.BASE_URL || `http://localhost:${env.port}`;
   },
   get port() {
-    return env.PORT || 1337
+    return env.PORT || 1337;
+  },
+  get root() {
+    return __dirname;
   },
   package: pkg,
   env,
-}
+};
+

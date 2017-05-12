@@ -1,7 +1,7 @@
 {
-  "name": "__BONES_NEEDS_A_NAME__",
+  "name": "line-distribution",
   "version": "0.0.1",
-  "description": "A happy little skeleton.",
+  "description": "Band Line Distribution calculator",
   "main": "index.js",
   "scripts": {
     "validate": "check-node-version --node '>= 6.7.0'",
@@ -12,6 +12,7 @@
     "build-watch": "npm run build -- -w",
     "build-dev": "cross-env NODE_ENV=development npm run build-watch",
     "build-branch": "bin/build-branch.sh",
+    "build-css": "node-sass -w -r assets/stylesheets -o public/css",
     "start": "node server/start.js",
     "start-watch": "nodemon server/start.js --watch server --watch db",
     "start-dev": "cross-env NODE_ENV=development npm run start-watch",
@@ -19,25 +20,27 @@
     "test": "mocha --compilers js:babel-register app/**/*.test.js app/**/*.test.jsx db/**/*.test.js server/**/*.test.js",
     "test-watch": "npm run test -- --watch",
     "seed": "node db/seed.js",
-    "deploy-heroku": "bin/deploy-heroku.sh"
+    "deploy-heroku": "bin/deploy-heroku.sh",
+    "complete-dev": "npm run build-css | npm run dev"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/queerviolet/bones.git"
+    "url": "git+https://github.com/kavispires/line-distribution-react.git"
   },
   "keywords": [
     "react",
     "redux",
     "skeleton"
   ],
-  "author": "Ashi Krishnan <me@ashi.works>",
+  "author": "Fabiano Kavis Pires",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/queerviolet/bones/issues"
+    "url": "https://github.com/kavispires/line-distribution-react/issues"
   },
-  "homepage": "https://github.com/queerviolet/bones#readme",
+  "homepage": "https://github.com/kavispires/line-distribution-react#readme",
   "dependencies": {
     "axios": "^0.15.2",
+    "babel-preset-stage-0": "^6.24.1",
     "babel-preset-stage-2": "^6.18.0",
     "bcryptjs": "^2.4.0",
     "body-parser": "^1.15.2",
@@ -77,6 +80,7 @@
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
     "mocha": "^3.1.2",
+    "node-sass": "^4.5.2",
     "nodemon": "^1.11.0",
     "supertest": "^3.0.0",
     "volleyball": "^1.4.1",
