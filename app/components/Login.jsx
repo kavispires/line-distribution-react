@@ -1,20 +1,20 @@
-import React from 'react'
+import React from 'react';
 
 export const Login = ({ login }) => (
-  <form onSubmit={evt => {
-    evt.preventDefault()
-    login(evt.target.username.value, evt.target.password.value)
+  <form className="login-form" onSubmit={evt => {
+    evt.preventDefault();
+    login(evt.target.username.value, evt.target.password.value);
   } }>
-    <input name="username" />
-    <input name="password" type="password" />
-    <input type="submit" value="Login" />
+    <input type="text" name="username" />
+    <input type="password" name="password" />
+    <input className="btn" type="submit" value="Login" />
   </form>
-)
+);
 
-import {login} from 'APP/app/reducers/auth'
-import {connect} from 'react-redux'
+import {login} from 'APP/app/reducers/auth';
+import {connect} from 'react-redux';
 
-export default connect (
+export default connect(
   state => ({}),
-  {login},
-) (Login)
+  {login}
+)(Login);
