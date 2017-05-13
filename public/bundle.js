@@ -32599,7 +32599,7 @@ var deleteBand = exports.deleteBand = function deleteBand(bandId) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.addBand = exports.loadNewBand = exports.editCustomMember = exports.addCustomMember = exports.loadColorList = exports.handlePublicStatus = exports.handleBandName = exports.checkBandName = exports.setColorList = exports.setPublicStatus = exports.setCurrentBandName = exports.setCurrentMember = exports.setNewMembers = exports.setNewMemberName = exports.setNewMemberColor = exports.setNewBand = undefined;
+exports.addBand = exports.loadNewBand = exports.removeCustomMember = exports.editCustomMember = exports.addCustomMember = exports.loadColorList = exports.handlePublicStatus = exports.handleBandName = exports.checkBandName = exports.toggleEditing = exports.setColorList = exports.setPublicStatus = exports.setCurrentBandName = exports.setCurrentMember = exports.setNewMembers = exports.setNewMemberName = exports.setNewMemberColor = exports.setNewBand = undefined;
 exports.default = reducer;
 
 var _axios = __webpack_require__(140);
@@ -32607,6 +32607,10 @@ var _axios = __webpack_require__(140);
 var _axios2 = _interopRequireDefault(_axios);
 
 var _reactRouter = __webpack_require__(139);
+
+var _lodash = __webpack_require__(346);
+
+var _lodash2 = _interopRequireDefault(_lodash);
 
 var _app = __webpack_require__(344);
 
@@ -32626,6 +32630,7 @@ var SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER';
 var SET_CURRENT_BAND_NAME = 'SET_CURRENT_BAND_NAME';
 var SET_PUBLIC_STATUS = 'SET_PUBLIC_STATUS';
 var SET_COLOR_LIST = 'SET_COLOR_LIST';
+var TOGGLE_EDITING = 'TOGGLE_EDITING';
 
 /* --------------   ACTION CREATORS   -------------- */
 
@@ -32653,6 +32658,9 @@ var setPublicStatus = exports.setPublicStatus = function setPublicStatus(status)
 var setColorList = exports.setColorList = function setColorList(list) {
 	return { type: SET_COLOR_LIST, list: list };
 };
+var toggleEditing = exports.toggleEditing = function toggleEditing(value) {
+	return { type: TOGGLE_EDITING, value: value };
+};
 
 /* -----------------   REDUCERS   ------------------ */
 
@@ -32663,7 +32671,8 @@ var initialState = {
 	newMemberName: '',
 	newMemberColor: '',
 	publicStatus: true,
-	colorList: []
+	colorList: [],
+	editing: false
 };
 
 function reducer() {
@@ -32705,6 +32714,10 @@ function reducer() {
 
 		case SET_COLOR_LIST:
 			newState.colorList = action.list;
+			break;
+
+		case TOGGLE_EDITING:
+			newState.editing = action.value;
 			break;
 
 		default:
@@ -32798,14 +32811,32 @@ var addCustomMember = exports.addCustomMember = function addCustomMember() {
 		} else {
 			dispatch((0, _app.displayWarning)('cb2', ''));
 		}
+
+		dispatch(loadColorList());
+		dispatch(toggleEditing(false));
 	};
 };
 
 var editCustomMember = exports.editCustomMember = function editCustomMember(member) {
-	return function (dispatch, getState) {
+	return function (dispatch) {
+		dispatch(toggleEditing(true));
 		dispatch(setNewMemberName(member.name));
 		dispatch(setNewMemberColor(member.color));
 		dispatch(loadColorList());
+	};
+};
+
+var removeCustomMember = exports.removeCustomMember = function removeCustomMember() {
+	return function (dispatch, getState) {
+		var memberName = getState().creator.newMemberName;
+		var newMembersCopy = _lodash2.default.filter([].concat(_toConsumableArray(getState().creator.newMembers)), function (m) {
+			return m.name !== memberName;
+		});
+		dispatch(setNewMembers(newMembersCopy));
+		dispatch(setNewMemberName(''));
+		dispatch(setNewMemberColor(''));
+		dispatch(loadColorList());
+		dispatch(toggleEditing(false));
 	};
 };
 
@@ -32820,7 +32851,6 @@ var loadNewBand = exports.loadNewBand = function loadNewBand() {
 
 var addBand = exports.addBand = function addBand() {
 	return function (dispatch, getState) {
-		console.log('Submit');
 		var bandName = getState().creator.newBandName;
 		var bandStatus = getState().creator.publicStatus;
 		var members = getState().creator.newMembers;
@@ -33026,6 +33056,7 @@ var mapStateToProps = function mapStateToProps(state) {
     warning: state.app.warning,
     currentBand: state.bands.currentBand,
     colorList: state.creator.colorList,
+    editing: state.creator.editing,
     newBand: state.creator.newBand,
     newBandName: state.creator.newBandName,
     newMembers: state.creator.newMembers,
@@ -33051,12 +33082,13 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
       return dispatch((0, _creator.setNewMemberColor)(color));
     },
     addCustomMember: function addCustomMember() {
-      dispatch((0, _creator.addCustomMember)());
-      dispatch((0, _creator.loadColorList)());
+      return dispatch((0, _creator.addCustomMember)());
     },
     editCustomMember: function editCustomMember(member) {
-      dispatch((0, _creator.editCustomMember)(member));
-      // dispatch(loadColorList());
+      return dispatch((0, _creator.editCustomMember)(member));
+    },
+    removeCustomMember: function removeCustomMember() {
+      return dispatch((0, _creator.removeCustomMember)());
     },
     handlePublicStatus: function handlePublicStatus(event) {
       return dispatch((0, _creator.handlePublicStatus)(event.target.value));
@@ -33845,6 +33877,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var CreateBand = function CreateBand(props) {
 
   var colorList = props.colorList;
+  var editing = props.editing;
   var newMemberColor = props.newMemberColor;
   var newMemberName = props.newMemberName;
   var newMembers = props.newMembers;
@@ -33859,7 +33892,10 @@ var CreateBand = function CreateBand(props) {
   var handleSubmit = props.handleSubmit;
   var addCustomMember = props.addCustomMember;
   var editCustomMember = props.editCustomMember;
-  // console.log(warning);
+  var removeCustomMember = props.removeCustomMember;
+
+  var addEditButtonName = editing ? 'Update' : 'Add';
+
   return _react2.default.createElement(
     'div',
     { className: 'row creator scrollable' },
@@ -33903,7 +33939,15 @@ var CreateBand = function CreateBand(props) {
         { className: 'btn btn-lg-mobile', type: 'submit', onClick: function onClick() {
             return addCustomMember();
           } },
-        'Add Member'
+        addEditButtonName,
+        ' Member'
+      ) : null,
+      editing ? _react2.default.createElement(
+        'button',
+        { className: 'btn btn-lg-mobile', type: 'button', onClick: function onClick() {
+            return removeCustomMember();
+          } },
+        'Remove Member'
       ) : null,
       _react2.default.createElement('hr', null),
       _react2.default.createElement(

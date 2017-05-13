@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { browserHistory } from 'react-router';
+import _ from 'lodash';
 
 import { setPopUpAlert, displayWarning } from './app';
 import { filterColors } from '../utils';
@@ -14,6 +15,7 @@ const SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER';
 const SET_CURRENT_BAND_NAME = 'SET_CURRENT_BAND_NAME';
 const SET_PUBLIC_STATUS = 'SET_PUBLIC_STATUS';
 const SET_COLOR_LIST = 'SET_COLOR_LIST';
+const TOGGLE_EDITING = 'TOGGLE_EDITING';
 
 /* --------------   ACTION CREATORS   -------------- */
 
@@ -25,6 +27,7 @@ export const setCurrentMember = (member) => ({ type: SET_CURRENT_MEMBER, member 
 export const setCurrentBandName = (bandName) => ({ type: SET_CURRENT_BAND_NAME, bandName });
 export const setPublicStatus = (status) => ({ type: SET_PUBLIC_STATUS, status });
 export const setColorList = (list) => ({ type: SET_COLOR_LIST, list });
+export const toggleEditing = (value) => ({ type: TOGGLE_EDITING, value});
 
 /* -----------------   REDUCERS   ------------------ */
 
@@ -35,7 +38,8 @@ const initialState = {
 	newMemberName: '',
 	newMemberColor: '',
 	publicStatus: true,
-	colorList: []
+	colorList: [],
+	editing: false
 };
 
 export default function reducer(prevState = initialState, action) {
@@ -74,6 +78,10 @@ export default function reducer(prevState = initialState, action) {
 
 		case SET_COLOR_LIST:
 			newState.colorList = action.list;
+			break;
+
+		case TOGGLE_EDITING:
+			newState.editing = action.value;
 			break;
 
 		default:
@@ -154,12 +162,26 @@ export const addCustomMember = () => (dispatch, getState) => {
 	} else {
 		dispatch(displayWarning('cb2', ''));
 	}
+
+	dispatch(loadColorList());
+	dispatch(toggleEditing(false));
 };
 
-export const editCustomMember = (member) => (dispatch, getState) => {
+export const editCustomMember = (member) => (dispatch) => {
+	dispatch(toggleEditing(true));
 	dispatch(setNewMemberName(member.name));
 	dispatch(setNewMemberColor(member.color));
 	dispatch(loadColorList());
+};
+
+export const removeCustomMember = () => (dispatch, getState) => {
+	const memberName = getState().creator.newMemberName;
+	let newMembersCopy = _.filter([...getState().creator.newMembers], (m) => m.name !== memberName);
+	dispatch(setNewMembers(newMembersCopy));
+	dispatch(setNewMemberName(''));
+	dispatch(setNewMemberColor(''));
+	dispatch(loadColorList());
+	dispatch(toggleEditing(false));
 };
 
 export const loadNewBand = () => (dispatch, getState) => {
@@ -170,7 +192,6 @@ export const loadNewBand = () => (dispatch, getState) => {
 };
 
 export const addBand = () => (dispatch, getState) => {
-	console.log('Submit');
 	const bandName = getState().creator.newBandName;
 	const bandStatus = getState().creator.publicStatus;
 	const members = getState().creator.newMembers;

@@ -5,6 +5,7 @@ import Warning from './Warning';
 const CreateBand = (props) => {
 
   const colorList = props.colorList;
+  const editing = props.editing;
   const newMemberColor = props.newMemberColor;
   const newMemberName = props.newMemberName;
   const newMembers = props.newMembers;
@@ -19,7 +20,10 @@ const CreateBand = (props) => {
   const handleSubmit = props.handleSubmit;
   const addCustomMember = props.addCustomMember;
   const editCustomMember = props.editCustomMember;
-  // console.log(warning);
+  const removeCustomMember = props.removeCustomMember;
+
+  let addEditButtonName = editing ? 'Update' : 'Add';
+
   return (
     <div className="row creator scrollable">
       <div className="row-container">
@@ -44,9 +48,11 @@ const CreateBand = (props) => {
           }
         </div>
         {
-          newMembers.length < 20 ? <button className="btn btn-lg-mobile" type="submit" onClick={() => addCustomMember()}>Add Member</button> : null
+          newMembers.length < 20 ? <button className="btn btn-lg-mobile" type="submit" onClick={() => addCustomMember()}>{addEditButtonName} Member</button> : null
         }
-        {/*<button className="btn btn-lg-mobile" type="button" onClick={removeCustomMember}>Remove Member</button>*/}
+        {
+          editing ? <button className="btn btn-lg-mobile" type="button" onClick={() => removeCustomMember()}>Remove Member</button> : null
+        }
         <hr />
         <h3>Members' List (<span>{newMembers.length}</span> of 20)</h3>
         {
