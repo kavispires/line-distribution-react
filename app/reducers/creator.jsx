@@ -91,7 +91,7 @@ export default function reducer(prevState = initialState, action) {
 export const checkBandName = (bandName) => (dispatch, getState) => {
 	const bands = getState().bands.allBands.map(band => band.name.toLowerCase().replace(/\s/g, ''));
 	const typedName = bandName.toLowerCase().replace(/\s/g, '');
-	
+
 	if (bands.indexOf(typedName) !== -1) {
 		return dispatch(displayWarning('cb1', `${bandName} already exists in the database. Please, search for this band and add it to your favorites instead of creating a duplicate.`));
 	} else {
@@ -115,7 +115,11 @@ export const loadColorList = () => (dispatch, getState) => {
 	if (newMembers.length > 0) {
 		usedColors = newMembers.map(member => member.color);
 	}
-	dispatch(setColorList(filterColors(usedColors)));
+	let availableColors = filterColors(usedColors);
+	// If member is being edited, add its color to the beginning
+	const memberColor = getState().creator.newMemberColor;
+	if (memberColor) availableColors.unshift(memberColor);
+	dispatch(setColorList(availableColors));
 };
 
 export const addCustomMember = () => (dispatch, getState) => {
@@ -152,9 +156,10 @@ export const addCustomMember = () => (dispatch, getState) => {
 	}
 };
 
-export const editCustomMember = (member) => (dispatch) => {
+export const editCustomMember = (member) => (dispatch, getState) => {
 	dispatch(setNewMemberName(member.name));
 	dispatch(setNewMemberColor(member.color));
+	dispatch(loadColorList());
 };
 
 export const loadNewBand = () => (dispatch, getState) => {

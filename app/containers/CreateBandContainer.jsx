@@ -29,7 +29,10 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(addCustomMember());
       dispatch(loadColorList());
     },
-    editCustomMember: (member) => dispatch(editCustomMember(member)),
+    editCustomMember: (member) => {
+      dispatch(editCustomMember(member));
+      // dispatch(loadColorList());
+    },
 		handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
     handleSubmit: () => dispatch(addBand())
 	};

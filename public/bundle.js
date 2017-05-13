@@ -32756,7 +32756,11 @@ var loadColorList = exports.loadColorList = function loadColorList() {
 				return member.color;
 			});
 		}
-		dispatch(setColorList((0, _utils.filterColors)(usedColors)));
+		var availableColors = (0, _utils.filterColors)(usedColors);
+		// If member is being edited, add its color to the beginning
+		var memberColor = getState().creator.newMemberColor;
+		if (memberColor) availableColors.unshift(memberColor);
+		dispatch(setColorList(availableColors));
 	};
 };
 
@@ -32798,9 +32802,10 @@ var addCustomMember = exports.addCustomMember = function addCustomMember() {
 };
 
 var editCustomMember = exports.editCustomMember = function editCustomMember(member) {
-	return function (dispatch) {
+	return function (dispatch, getState) {
 		dispatch(setNewMemberName(member.name));
 		dispatch(setNewMemberColor(member.color));
+		dispatch(loadColorList());
 	};
 };
 
@@ -33050,7 +33055,8 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
       dispatch((0, _creator.loadColorList)());
     },
     editCustomMember: function editCustomMember(member) {
-      return dispatch((0, _creator.editCustomMember)(member));
+      dispatch((0, _creator.editCustomMember)(member));
+      // dispatch(loadColorList());
     },
     handlePublicStatus: function handlePublicStatus(event) {
       return dispatch((0, _creator.handlePublicStatus)(event.target.value));
