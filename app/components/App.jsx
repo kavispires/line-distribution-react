@@ -1,12 +1,14 @@
 import React from 'react';
 
-import Header from '../components/Header';
+import Header from './Header';
+import PopUpAlert from './PopUpAlert';
 
-const App = ({children}) => {
+const App = ({children, alert, closePopUpAlert}) => {
 	return (
 		<div className="container">
 			<Header />
 			{ children }
+      <PopUpAlert message={alert} closePopUpAlert={closePopUpAlert} />
 		</div>
 	);
 };

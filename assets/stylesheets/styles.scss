@@ -12,9 +12,10 @@ $negative-dark: #A7A7A7;
 
 $white: #FFFFFF;
 
-$alert: #868471;
-$danger: #866b66;
-$focus: #757A86;
+$alert: #f4e775;
+$warning: #f4e775;
+$danger: #dd8593;
+$focus: #92d2e4;
 
 html {
   font-size: 1em;
@@ -167,13 +168,14 @@ header {
   border: 1px solid $primary;
   border-top: 10px solid $primary;
   font-size: 80%;
+  background: $white;
 
   .content {
     margin: 0;
   }
 }
 
-.alert {
+.warning {
   @extend .span-box;
   border-color: $alert;
   padding-right: 9px;
@@ -194,7 +196,7 @@ header {
   border-color: $focus;
 }
 
-.warning {
+.danger {
   @extend .span-box;
   border-color: $danger;
 }
@@ -542,10 +544,26 @@ table {
   justify-content: center;
   align-items: center;
 
-  .modal-content {
+  .modal-border {
     background: $white;
     width: 80%;
     padding: 20px;
     @include border-radius(5px);
+  }
+
+  .modal-content {
+    width: 100%;
+    padding: 20px;
+    border: 2px solid $alert;
+    @include border-radius(5px);
+
+    .btn {
+      margin-top: 30px;
+    }
+
+    .icon {
+      font-size: 200%;
+      color: $alert;
+    }
   }
 }

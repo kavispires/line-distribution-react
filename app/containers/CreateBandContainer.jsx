@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
 
 import CreateBand from '../components/CreateBand';
-import { loadColorList, checkBandName, handleBandName, setNewMemberColor, setNewMemberName, addCustomMember, editCustomMember, handlePublicStatus, addBand, closeModal } from '../reducers/creator';
+import { loadColorList, checkBandName, handleBandName, setNewMemberColor, setNewMemberName, addCustomMember, editCustomMember, handlePublicStatus, addBand } from '../reducers/creator';
 
 const mapStateToProps = (state) => {
   return {
     user: state.auth,
-    alert: state.creator.alert,
+    warning: state.app.warning,
     currentBand: state.bands.currentBand,
     colorList: state.creator.colorList,
     newBand: state.creator.newBand,
@@ -16,7 +16,6 @@ const mapStateToProps = (state) => {
     newMemberName: state.creator.newMemberName,
     newMemberColor: state.creator.newMemberColor,
     publicStatus: state.creator.publicStatus,
-    modalMessage: state.creator.modalMessage
   };
 };
 
@@ -32,8 +31,7 @@ const mapDispatchToProps = (dispatch) => {
     },
     editCustomMember: (member) => dispatch(editCustomMember(member)),
 		handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
-    handleSubmit: () => dispatch(addBand()),
-    closeModal: () => dispatch(closeModal())
+    handleSubmit: () => dispatch(addBand())
 	};
 };
 

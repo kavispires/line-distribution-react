@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { browserHistory } from 'react-router';
 
+import { setPopUpAlert, displayWarning } from './app';
 import { filterColors } from '../utils';
 
 /* ------------------   ACTIONS   ------------------ */
-
 
 const SET_NEW_BAND = 'SET_NEW_BAND';
 const SET_NEW_MEMBER_COLOR = 'SET_NEW_MEMBER_COLOR';
@@ -17,8 +17,6 @@ const SET_COLOR_LIST = 'SET_COLOR_LIST';
 
 /* --------------   ACTION CREATORS   -------------- */
 
-export const setAlert = (message) => ({ type: SET_ALERT, message });
-export const setModal = (message) => ({ type: SET_MODAL, message });
 export const setNewBand = (band) => ({ type: SET_NEW_BAND, band });
 export const setNewMemberColor = (color) => ({ type: SET_NEW_MEMBER_COLOR, color });
 export const setNewMemberName = (name) => ({ type: SET_NEW_MEMBER_NAME, name });
@@ -37,9 +35,7 @@ const initialState = {
 	newMemberName: '',
 	newMemberColor: '',
 	publicStatus: true,
-	colorList: [],
-	alert: '',
-	modalMessage: ''
+	colorList: []
 };
 
 export default function reducer(prevState = initialState, action) {
@@ -95,10 +91,11 @@ export default function reducer(prevState = initialState, action) {
 export const checkBandName = (bandName) => (dispatch, getState) => {
 	const bands = getState().bands.allBands.map(band => band.name.toLowerCase().replace(/\s/g, ''));
 	const typedName = bandName.toLowerCase().replace(/\s/g, '');
+	
 	if (bands.indexOf(typedName) !== -1) {
-		return dispatch(setAlert(`${bandName} already exists in the database. Please, search for this band and add it to your favorites instead of creating a duplicate.`));
+		return dispatch(displayWarning('cb1', `${bandName} already exists in the database. Please, search for this band and add it to your favorites instead of creating a duplicate.`));
 	} else {
-		return dispatch(setAlert(''));
+		return dispatch(displayWarning('cb1', ''));
 	}
 };
 
@@ -147,6 +144,12 @@ export const addCustomMember = () => (dispatch, getState) => {
 	dispatch(setNewMemberName(''));
 	dispatch(setNewMemberColor(''));
 	dispatch(setNewMembers(newMembers));
+
+	if (getState().creator.newMembers.length === 20) {
+		dispatch(displayWarning('cb2', `You've reached the maximum number of members of 20. Save your band or edit previously created members.`));
+	} else {
+		dispatch(displayWarning('cb2', ''));
+	}
 };
 
 export const editCustomMember = (member) => (dispatch) => {
@@ -169,10 +172,10 @@ export const addBand = () => (dispatch, getState) => {
 	const userId = getState().auth.id;
 
 	if (bandName === '') {
-		return dispatch(setModal('Your band must have a name.'));
+		return dispatch(setPopUpAlert('Your band must have a name.'));
 	}
 	if (members.length < 2) {
-		return dispatch(setModal('Your band must have at least 2 members'));
+		return dispatch(setPopUpAlert('Your band must have at least 2 members'));
 	}
 
 	const bandToAdd = {
@@ -189,9 +192,4 @@ export const addBand = () => (dispatch, getState) => {
 			browserHistory.push('/myBands');
 		});
 
-};
-
-export const closeModal = () => (dispatch) => {
-	console.log('CLOSE');
-	return dispatch(setModal(''));
 };

@@ -2,10 +2,19 @@ import { connect } from 'react-redux';
 
 import App from '../components/App';
 
+import { closePopUpAlert } from '../reducers/app';
+
 const mapStateToProps = (state) => {
   return {
-    user: state.auth
+    user: state.auth,
+    alert: state.app.alert
   };
 };
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = (dispatch) => {
+	return {
+		closePopUpAlert: () => dispatch(closePopUpAlert())
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
