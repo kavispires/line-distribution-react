@@ -5,6 +5,8 @@ const Band = db.model('bands');
 const Member = db.model('members');
 const Song = db.model('songs');
 
+const {mustBeLoggedIn, forbidden} = require('./auth.filters');
+
 module.exports = require('express').Router()
   .get('/',
     (req, res, next) =>
@@ -36,4 +38,15 @@ module.exports = require('express').Router()
         order: ['name']
       })
       .then(songs => res.json(songs))
-      .catch(next));
+      .catch(next))
+  .put('/:id/delete',
+    mustBeLoggedIn,
+    (req, res, next) =>
+      Band.update(
+        {user_id: null},
+        { where: {
+            id: req.params.id
+          }
+        })
+        .then(band => res.json(band))
+        .catch(next));

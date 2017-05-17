@@ -216,6 +216,7 @@ export const addBand = () => (dispatch, getState) => {
 		.then(() => {
 			console.log('Band created');
 			browserHistory.push('/myBands');
-		});
+		})
+		.catch(err => console.error(err));
 
 };

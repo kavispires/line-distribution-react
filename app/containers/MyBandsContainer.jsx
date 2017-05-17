@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import MyBands from '../components/MyBands';
-import { handleCreateBandClick, loadCurrentBand } from '../reducers/bands';
+import { deleteBand, editBand, handleCreateBandClick, loadCurrentBand } from '../reducers/bands';
 
 const mapStateToProps = (state) => {
   return {
@@ -15,7 +15,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		handleCreateBandClick: (value) => dispatch(handleCreateBandClick(value)),
-		loadCurrentBand: (id) => dispatch(loadCurrentBand(id))
+		loadCurrentBand: (id) => dispatch(loadCurrentBand(id)),
+    editBand: (id) => dispatch(editBand(id)),
+    deleteBand: (id) => dispatch(deleteBand(id))
 	};
 };
 

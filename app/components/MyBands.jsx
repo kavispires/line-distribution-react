@@ -1,15 +1,6 @@
 import React from 'react';
 
-const MyBands = ({myBands, favoriteBands, handleCreateBandClick, loadCurrentBand}) => {
-  const selectBand = (id) => {
-    console.log('Selected ', id);
-  };
-  const editBand = (id) => {
-    console.log('Edit ', id);
-  };
-  const deleteBand = (id) => {
-    console.log('Delete ', id);
-  };
+const MyBands = ({myBands, favoriteBands, handleCreateBandClick, loadCurrentBand, deleteBand, editBand}) => {
 
   return (
     <div className="row scrollable">
@@ -51,7 +42,7 @@ const MyBands = ({myBands, favoriteBands, handleCreateBandClick, loadCurrentBand
             }
           </tbody>
         </table>
-        <p><small>If you delete your public custom bands, your creator credit will be removed, but the band will still be available in the search box for other users.</small></p>
+        <p><small>If you delete your public custom bands, your credit as creator will be removed, but the band will still be available in the search box for other users.</small></p>
         <h2>Favorite Bands <span className="h2-count">({ myBands.length })</span></h2>
         <table className="favorite-bands">
           <thead>
@@ -70,10 +61,10 @@ const MyBands = ({myBands, favoriteBands, handleCreateBandClick, loadCurrentBand
                   const members = band.members.map(mmember => mmember.name).join(', ');
                   return (
                     <tr key={ band.id }>
-                      <td>{ band.name }</td>
-                      <td>{ `OT${band.members.length}` }</td>
-                      <td>{ members }</td>
-                      <td>{ `0` }</td>
+                      <td onClick={() => loadCurrentBand(band.id)}>{ band.name }</td>
+                      <td onClick={() => loadCurrentBand(band.id)}>{ `OT${band.members.length}` }</td>
+                      <td onClick={() => loadCurrentBand(band.id)}>{ members }</td>
+                      <td onClick={() => loadCurrentBand(band.id)}>{ `0` }</td>
                       <td><span className="icon icon-trash btn-icon" /></td>
                     </tr>
                   );

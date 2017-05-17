@@ -16,7 +16,7 @@ export const setWarning = warning => ({ type: SET_WARNING, warning });
 
 const initialState = {
   alert: '',
-  prompt: '',
+  prompt: {}, // {message: '', callback: {}}
   warning: {} // {id: '', message: ''}
 };
 
@@ -62,6 +62,7 @@ export const displayPopUpAlert = (message) => (dispatch) => {
   return dispatch(setPopUpAlert(message));
 };
 
-export const closePopUpAlert = () => (dispatch) => {
-  return dispatch(setPopUpAlert(''));
+export const closePopUp = () => (dispatch) => {
+  dispatch(setPopUpAlert(''));
+  dispatch(setPopUpPrompt({}));
 };

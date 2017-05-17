@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PopUpAlert = ({message, closePopUpAlert}) => {
+const PopUpAlert = ({message, closePopUp}) => {
   return (
     <div>
       {
@@ -10,7 +10,7 @@ const PopUpAlert = ({message, closePopUpAlert}) => {
 	            <div className="modal-content">
 	            	<span className="icon icon-exclamation-triangle" /><br />
 	              <p>{message}</p>
-	              <button className="btn btn-20" onClick={() => closePopUpAlert()}>OK</button>
+	              <button className="btn btn-20" onClick={() => closePopUp()}>OK</button>
 	            </div>
 	          </div>
           </div>)

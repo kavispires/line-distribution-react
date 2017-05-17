@@ -45,7 +45,7 @@ module.exports = require('express').Router()
       .then(bands => res.json(bands))
       .catch(next))
   .get('/:id/favoritebands',
-    // mustBeLoggedIn,
+    mustBeLoggedIn,
     (req, res, next) =>
       Band.findAll({
         where: {
@@ -57,7 +57,7 @@ module.exports = require('express').Router()
       .then(bands => res.json(bands))
       .catch(next))
   .get('/:id/songs',
-    // mustBeLoggedIn,
+    mustBeLoggedIn,
     (req, res, next) =>
       Song.findAll({
         where: {

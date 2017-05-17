@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { browserHistory } from 'react-router';
 
+import { setPopUpPrompt } from './app';
+
 /* ------------------   ACTIONS   ------------------ */
 
 const SET_ALL_BANDS = 'SET_ALL_BANDS';
@@ -97,7 +99,19 @@ export const handleCreateBandClick = (editing) => (dispatch) => {
 
 // It doesn't really delete the band, but removes its owner/user_id
 export const deleteBand = (bandId) => (dispatch) => {
-	return axios.put(`api/bands/${bandId}`)
+	return axios.put(`api/bands/${bandId}/delete`)
 		.then(res => res.data)
-		// .then(band => )
+		.then(() => {
+			console.log('Band deleted.');
+			dispatch(loadBands());
+		})
+		.catch(err => console.error(err));
+};
+
+export const editBand = (bandId) => (dispatch) => {
+	axios.get(`api/bands/${bandId}`)
+		.then(res => res.data)
+		.then(band => dispatch(setCurrentBand(band)))
+		.catch(err => console.error(err));
+	browserHistory.push(`/create`);
 };
