@@ -2,6 +2,7 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';
 
 import { setPopUpPrompt } from './app';
+import { setNewBandName, setNewMembers, setPublicStatus, toggleEditingBand } from './creator';
 
 /* ------------------   ACTIONS   ------------------ */
 
@@ -92,8 +93,12 @@ export const loadCurrentBand = (bandId) => (dispatch) => {
 	browserHistory.push(`/distribute`);
 };
 
-export const handleCreateBandClick = (editing) => (dispatch) => {
+export const handleCreateBandClick = () => (dispatch) => {
 	dispatch(setCurrentBand({}));
+	dispatch(setNewBandName(''));
+	dispatch(setNewMembers([]));
+	dispatch(setPublicStatus(true));
+	dispatch(toggleEditingBand(false));
 	browserHistory.push(`/create`);
 };
 
@@ -111,7 +116,13 @@ export const deleteBand = (bandId) => (dispatch) => {
 export const editBand = (bandId) => (dispatch) => {
 	axios.get(`api/bands/${bandId}`)
 		.then(res => res.data)
-		.then(band => dispatch(setCurrentBand(band)))
+		.then(band => {
+			dispatch(setCurrentBand(band));
+			dispatch(setNewBandName(band.name));
+			dispatch(setNewMembers(band.members));
+			dispatch(setPublicStatus(band.public));
+			dispatch(toggleEditingBand(true));
+		})
+		.then(() => browserHistory.push(`/create`))
 		.catch(err => console.error(err));
-	browserHistory.push(`/create`);
 };

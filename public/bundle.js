@@ -6317,6 +6317,8 @@ var _reactRouter = __webpack_require__(31);
 
 var _app = __webpack_require__(42);
 
+var _creator = __webpack_require__(55);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* ------------------   ACTIONS   ------------------ */
@@ -6437,9 +6439,13 @@ var loadCurrentBand = exports.loadCurrentBand = function loadCurrentBand(bandId)
 	};
 };
 
-var handleCreateBandClick = exports.handleCreateBandClick = function handleCreateBandClick(editing) {
+var handleCreateBandClick = exports.handleCreateBandClick = function handleCreateBandClick() {
 	return function (dispatch) {
 		dispatch(setCurrentBand({}));
+		dispatch((0, _creator.setNewBandName)(''));
+		dispatch((0, _creator.setNewMembers)([]));
+		dispatch((0, _creator.setPublicStatus)(true));
+		dispatch((0, _creator.toggleEditingBand)(false));
 		_reactRouter.browserHistory.push('/create');
 	};
 };
@@ -6463,11 +6469,16 @@ var editBand = exports.editBand = function editBand(bandId) {
 		_axios2.default.get('api/bands/' + bandId).then(function (res) {
 			return res.data;
 		}).then(function (band) {
-			return dispatch(setCurrentBand(band));
+			dispatch(setCurrentBand(band));
+			dispatch((0, _creator.setNewBandName)(band.name));
+			dispatch((0, _creator.setNewMembers)(band.members));
+			dispatch((0, _creator.setPublicStatus)(band.public));
+			dispatch((0, _creator.toggleEditingBand)(true));
+		}).then(function () {
+			return _reactRouter.browserHistory.push('/create');
 		}).catch(function (err) {
 			return console.error(err);
 		});
-		_reactRouter.browserHistory.push('/create');
 	};
 };
 
@@ -6481,7 +6492,7 @@ var editBand = exports.editBand = function editBand(bandId) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.addBand = exports.loadNewBand = exports.removeCustomMember = exports.editCustomMember = exports.addCustomMember = exports.loadColorList = exports.handlePublicStatus = exports.handleBandName = exports.checkBandName = exports.toggleEditing = exports.setColorList = exports.setPublicStatus = exports.setCurrentBandName = exports.setCurrentMember = exports.setNewMembers = exports.setNewMemberName = exports.setNewMemberColor = exports.setNewBand = undefined;
+exports.updateBand = exports.addBand = exports.loadNewBand = exports.removeCustomMember = exports.editCustomMember = exports.addCustomMember = exports.loadColorList = exports.handlePublicStatus = exports.handleBandName = exports.checkBandName = exports.toggleEditingMember = exports.toggleEditingBand = exports.setColorList = exports.setPublicStatus = exports.setCurrentBandName = exports.setCurrentMember = exports.setNewMembers = exports.setNewMemberId = exports.setNewMemberName = exports.setNewMemberColor = exports.setNewBandName = exports.setNewBand = undefined;
 exports.default = reducer;
 
 var _axios = __webpack_require__(41);
@@ -6505,25 +6516,34 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 /* ------------------   ACTIONS   ------------------ */
 
 var SET_NEW_BAND = 'SET_NEW_BAND';
+var SET_NEW_BAND_NAME = 'SET_NEW_BAND_NAME';
 var SET_NEW_MEMBER_COLOR = 'SET_NEW_MEMBER_COLOR';
 var SET_NEW_MEMBER_NAME = 'SET_NEW_MEMBER_NAME';
+var SET_NEW_MEMBER_ID = 'SET_NEW_MEMBER_ID';
 var SET_NEW_MEMBERS = 'SET_NEW_MEMBERS';
 var SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER';
 var SET_CURRENT_BAND_NAME = 'SET_CURRENT_BAND_NAME';
 var SET_PUBLIC_STATUS = 'SET_PUBLIC_STATUS';
 var SET_COLOR_LIST = 'SET_COLOR_LIST';
-var TOGGLE_EDITING = 'TOGGLE_EDITING';
+var TOGGLE_EDITING_BAND = 'TOGGLE_EDITING_BAND';
+var TOGGLE_EDITING_MEMBER = 'TOGGLE_EDITING_MEMBER';
 
 /* --------------   ACTION CREATORS   -------------- */
 
 var setNewBand = exports.setNewBand = function setNewBand(band) {
 	return { type: SET_NEW_BAND, band: band };
 };
+var setNewBandName = exports.setNewBandName = function setNewBandName(name) {
+	return { type: SET_NEW_BAND_NAME, name: name };
+};
 var setNewMemberColor = exports.setNewMemberColor = function setNewMemberColor(color) {
 	return { type: SET_NEW_MEMBER_COLOR, color: color };
 };
 var setNewMemberName = exports.setNewMemberName = function setNewMemberName(name) {
 	return { type: SET_NEW_MEMBER_NAME, name: name };
+};
+var setNewMemberId = exports.setNewMemberId = function setNewMemberId(id) {
+	return { type: SET_NEW_MEMBER_ID, id: id };
 };
 var setNewMembers = exports.setNewMembers = function setNewMembers(members) {
 	return { type: SET_NEW_MEMBERS, members: members };
@@ -6540,8 +6560,11 @@ var setPublicStatus = exports.setPublicStatus = function setPublicStatus(status)
 var setColorList = exports.setColorList = function setColorList(list) {
 	return { type: SET_COLOR_LIST, list: list };
 };
-var toggleEditing = exports.toggleEditing = function toggleEditing(value) {
-	return { type: TOGGLE_EDITING, value: value };
+var toggleEditingBand = exports.toggleEditingBand = function toggleEditingBand(value) {
+	return { type: TOGGLE_EDITING_BAND, value: value };
+};
+var toggleEditingMember = exports.toggleEditingMember = function toggleEditingMember(value) {
+	return { type: TOGGLE_EDITING_MEMBER, value: value };
 };
 
 /* -----------------   REDUCERS   ------------------ */
@@ -6552,9 +6575,11 @@ var initialState = {
 	newMembers: [],
 	newMemberName: '',
 	newMemberColor: '',
+	newMemberId: 0,
 	publicStatus: true,
 	colorList: [],
-	editing: false
+	editingMember: false,
+	editingBand: false
 };
 
 function reducer() {
@@ -6570,6 +6595,10 @@ function reducer() {
 			newState.newBand = action.band;
 			break;
 
+		case SET_NEW_BAND_NAME:
+			newState.newBandName = action.name;
+			break;
+
 		case SET_CURRENT_BAND_NAME:
 			newState.newBandName = action.bandName;
 			break;
@@ -6580,6 +6609,10 @@ function reducer() {
 
 		case SET_NEW_MEMBER_NAME:
 			newState.newMemberName = action.name;
+			break;
+
+		case SET_NEW_MEMBER_ID:
+			newState.newMemberId = action.id;
 			break;
 
 		case SET_NEW_MEMBERS:
@@ -6598,8 +6631,12 @@ function reducer() {
 			newState.colorList = action.list;
 			break;
 
-		case TOGGLE_EDITING:
-			newState.editing = action.value;
+		case TOGGLE_EDITING_BAND:
+			newState.editingBand = action.value;
+			break;
+
+		case TOGGLE_EDITING_MEMBER:
+			newState.editingMember = action.value;
 			break;
 
 		default:
@@ -6661,14 +6698,17 @@ var loadColorList = exports.loadColorList = function loadColorList() {
 
 var addCustomMember = exports.addCustomMember = function addCustomMember() {
 	return function (dispatch, getState) {
+		var newMembers = [].concat(_toConsumableArray(getState().creator.newMembers));
+
+		// This id is only used when editing a member;
+		var id = getState().creator.newMemberId;
+		if (id === 0) id = 'n' + (newMembers.length + 1);
+
 		var member = {
 			name: getState().creator.newMemberName,
-			color: getState().creator.newMemberColor
+			color: getState().creator.newMemberColor,
+			id: id
 		};
-		var newMembers = [].concat(_toConsumableArray(getState().creator.newMembers));
-		var index = newMembers.findIndex(function (el) {
-			return el.name === member.name;
-		});
 
 		// Assign random name, if member doesn't have one;
 		if (!member.name) {
@@ -6682,10 +6722,21 @@ var addCustomMember = exports.addCustomMember = function addCustomMember() {
 		}
 
 		// Add or update to array
-		if (index === -1) newMembers.push(member);else newMembers[index] = member;
-		loadColorList();
+		var editingMember = getState().creator.editingMember;
+
+		if (!editingMember) {
+			newMembers.push(member);
+		} else {
+			var index = newMembers.findIndex(function (el) {
+				return el.id === member.id;
+			});
+			if (index) newMembers[index] = member;else newMembers.push(member);
+		}
+
+		dispatch(loadColorList());
 		dispatch(setNewMemberName(''));
 		dispatch(setNewMemberColor(''));
+		dispatch(setNewMemberId(0));
 		dispatch(setNewMembers(newMembers));
 
 		if (getState().creator.newMembers.length === 20) {
@@ -6695,15 +6746,16 @@ var addCustomMember = exports.addCustomMember = function addCustomMember() {
 		}
 
 		dispatch(loadColorList());
-		dispatch(toggleEditing(false));
+		dispatch(toggleEditingMember(false));
 	};
 };
 
 var editCustomMember = exports.editCustomMember = function editCustomMember(member) {
 	return function (dispatch) {
-		dispatch(toggleEditing(true));
+		dispatch(toggleEditingMember(true));
 		dispatch(setNewMemberName(member.name));
 		dispatch(setNewMemberColor(member.color));
+		dispatch(setNewMemberId(member.id));
 		dispatch(loadColorList());
 	};
 };
@@ -6717,8 +6769,9 @@ var removeCustomMember = exports.removeCustomMember = function removeCustomMembe
 		dispatch(setNewMembers(newMembersCopy));
 		dispatch(setNewMemberName(''));
 		dispatch(setNewMemberColor(''));
+		dispatch(setNewMemberId(0));
 		dispatch(loadColorList());
-		dispatch(toggleEditing(false));
+		dispatch(toggleEditingMember(false));
 	};
 };
 
@@ -6753,9 +6806,33 @@ var addBand = exports.addBand = function addBand() {
 			members: members
 		};
 
-		return _axios2.default.post('/api/bands', bandToAdd).then(function () {
-			console.log('Band created');
+		return _axios2.default.post('/api/bands', bandToAdd).then(function (band) {
+			console.log('Band created', band);
 			_reactRouter.browserHistory.push('/myBands');
+		}).catch(function (err) {
+			return console.error(err);
+		});
+	};
+};
+
+var updateBand = exports.updateBand = function updateBand() {
+	return function (dispatch, getState) {
+		var bandId = getState().bands.currentBand.id;
+		var bandStatus = getState().creator.publicStatus;
+		var members = getState().creator.newMembers.map(function (m) {
+			if (isNaN(m.id)) delete m.id;
+			return m;
+		});
+		var bandToUpdate = {
+			status: bandStatus,
+			members: members
+		};
+
+		return _axios2.default.put('/api/bands/' + bandId + '/update', bandToUpdate).then(function (band) {
+			console.log('Band updated', band);
+			dispatch(setNewBandName(''));
+			dispatch(setNewMembers([]));
+			_reactRouter.browserHistory.push('/mybands');
 		}).catch(function (err) {
 			return console.error(err);
 		});
@@ -32893,7 +32970,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var CreateBand = function CreateBand(props) {
 
   var colorList = props.colorList;
-  var editing = props.editing;
+  var editingBand = props.editingBand;
+  var editingMember = props.editingMember;
+  var newBandName = props.newBandName;
   var newMemberColor = props.newMemberColor;
   var newMemberName = props.newMemberName;
   var newMembers = props.newMembers;
@@ -32906,11 +32985,13 @@ var CreateBand = function CreateBand(props) {
   var handleMemberName = props.handleMemberName;
   var handlePublicStatus = props.handlePublicStatus;
   var handleSubmit = props.handleSubmit;
+  var handleUpdate = props.handleUpdate;
   var addCustomMember = props.addCustomMember;
   var editCustomMember = props.editCustomMember;
   var removeCustomMember = props.removeCustomMember;
 
-  var addEditButtonName = editing ? 'Update' : 'Add';
+  var addEditButtonName = editingMember ? 'Update' : 'Add';
+  var pageTitle = editingBand ? newBandName : 'Create Band';
 
   return _react2.default.createElement(
     'div',
@@ -32921,13 +33002,17 @@ var CreateBand = function CreateBand(props) {
       _react2.default.createElement(
         'h2',
         null,
-        'Create Band'
+        pageTitle
       ),
-      _react2.default.createElement('input', { className: 'textfield', type: 'text', name: 'setname', placeholder: 'Define Band Name', onChange: handleBandName, onBlur: function onBlur(event) {
-          return checkBandName(event);
-        } }),
-      _react2.default.createElement('br', null),
-      warning ? _react2.default.createElement(_Warning2.default, { message: warning.cb1 }) : null,
+      editingBand ? null : _react2.default.createElement(
+        'span',
+        null,
+        _react2.default.createElement('input', { className: 'textfield', type: 'text', name: 'setname', placeholder: 'Define Band Name', onChange: handleBandName, onBlur: function onBlur(event) {
+            return checkBandName(event);
+          } }),
+        _react2.default.createElement('br', null),
+        warning ? _react2.default.createElement(_Warning2.default, { message: warning.cb1 }) : null
+      ),
       _react2.default.createElement(
         'div',
         { className: 'public-status' },
@@ -32958,7 +33043,7 @@ var CreateBand = function CreateBand(props) {
         addEditButtonName,
         ' Member'
       ) : null,
-      editing ? _react2.default.createElement(
+      editingMember ? _react2.default.createElement(
         'button',
         { className: 'btn btn-lg-mobile', type: 'button', onClick: function onClick() {
             return removeCustomMember();
@@ -33001,7 +33086,13 @@ var CreateBand = function CreateBand(props) {
         })
       ),
       _react2.default.createElement('hr', null),
-      _react2.default.createElement(
+      editingBand ? _react2.default.createElement(
+        'button',
+        { className: 'btn btn-lg-mobile', onClick: function onClick() {
+            return handleUpdate();
+          } },
+        'Update Set'
+      ) : _react2.default.createElement(
         'button',
         { className: 'btn btn-lg-mobile', onClick: function onClick() {
             return handleSubmit();
@@ -33810,7 +33901,8 @@ var mapStateToProps = function mapStateToProps(state) {
     warning: state.app.warning,
     currentBand: state.bands.currentBand,
     colorList: state.creator.colorList,
-    editing: state.creator.editing,
+    editingBand: state.creator.editingBand,
+    editingMember: state.creator.editingMember,
     newBand: state.creator.newBand,
     newBandName: state.creator.newBandName,
     newMembers: state.creator.newMembers,
@@ -33849,6 +33941,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     },
     handleSubmit: function handleSubmit() {
       return dispatch((0, _creator.addBand)());
+    },
+    handleUpdate: function handleUpdate() {
+      return dispatch((0, _creator.updateBand)());
     }
   };
 };

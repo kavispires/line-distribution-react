@@ -1,7 +1,12 @@
 import { connect } from 'react-redux';
 
 import MyBands from '../components/MyBands';
-import { deleteBand, editBand, handleCreateBandClick, loadCurrentBand } from '../reducers/bands';
+import {
+  deleteBand,
+  editBand,
+  handleCreateBandClick,
+  loadCurrentBand
+} from '../reducers/bands';
 
 const mapStateToProps = (state) => {
   return {

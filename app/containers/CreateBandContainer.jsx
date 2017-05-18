@@ -1,7 +1,18 @@
 import { connect } from 'react-redux';
 
 import CreateBand from '../components/CreateBand';
-import { checkBandName, handleBandName, setNewMemberColor, setNewMemberName, addCustomMember, editCustomMember, handlePublicStatus, addBand, removeCustomMember } from '../reducers/creator';
+import {
+    addBand,
+    addCustomMember,
+    editCustomMember,
+    checkBandName,
+    handleBandName,
+    handlePublicStatus,
+    removeCustomMember,
+    setNewMemberColor,
+    setNewMemberName,
+    updateBand
+} from '../reducers/creator';
 
 const mapStateToProps = (state) => {
   return {
@@ -9,7 +20,8 @@ const mapStateToProps = (state) => {
     warning: state.app.warning,
     currentBand: state.bands.currentBand,
     colorList: state.creator.colorList,
-    editing: state.creator.editing,
+    editingBand: state.creator.editingBand,
+    editingMember: state.creator.editingMember,
     newBand: state.creator.newBand,
     newBandName: state.creator.newBandName,
     newMembers: state.creator.newMembers,
@@ -29,8 +41,9 @@ const mapDispatchToProps = (dispatch) => {
     addCustomMember: () => dispatch(addCustomMember()),
     editCustomMember: (member) => dispatch(editCustomMember(member)),
     removeCustomMember: () => dispatch(removeCustomMember()),
-		handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
-    handleSubmit: () => dispatch(addBand())
+	handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
+    handleSubmit: () => dispatch(addBand()),
+    handleUpdate: () => dispatch(updateBand())
 	};
 };
 

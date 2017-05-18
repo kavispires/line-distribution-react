@@ -8,26 +8,32 @@ import { filterColors } from '../utils';
 /* ------------------   ACTIONS   ------------------ */
 
 const SET_NEW_BAND = 'SET_NEW_BAND';
+const SET_NEW_BAND_NAME = 'SET_NEW_BAND_NAME';
 const SET_NEW_MEMBER_COLOR = 'SET_NEW_MEMBER_COLOR';
 const SET_NEW_MEMBER_NAME = 'SET_NEW_MEMBER_NAME';
+const SET_NEW_MEMBER_ID = 'SET_NEW_MEMBER_ID';
 const SET_NEW_MEMBERS = 'SET_NEW_MEMBERS';
 const SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER';
 const SET_CURRENT_BAND_NAME = 'SET_CURRENT_BAND_NAME';
 const SET_PUBLIC_STATUS = 'SET_PUBLIC_STATUS';
 const SET_COLOR_LIST = 'SET_COLOR_LIST';
-const TOGGLE_EDITING = 'TOGGLE_EDITING';
+const TOGGLE_EDITING_BAND = 'TOGGLE_EDITING_BAND';
+const TOGGLE_EDITING_MEMBER = 'TOGGLE_EDITING_MEMBER';
 
 /* --------------   ACTION CREATORS   -------------- */
 
 export const setNewBand = (band) => ({ type: SET_NEW_BAND, band });
+export const setNewBandName = (name) => ({ type: SET_NEW_BAND_NAME, name });
 export const setNewMemberColor = (color) => ({ type: SET_NEW_MEMBER_COLOR, color });
 export const setNewMemberName = (name) => ({ type: SET_NEW_MEMBER_NAME, name });
+export const setNewMemberId = (id) => ({ type: SET_NEW_MEMBER_ID, id });
 export const setNewMembers = (members) => ({ type: SET_NEW_MEMBERS, members });
 export const setCurrentMember = (member) => ({ type: SET_CURRENT_MEMBER, member });
 export const setCurrentBandName = (bandName) => ({ type: SET_CURRENT_BAND_NAME, bandName });
 export const setPublicStatus = (status) => ({ type: SET_PUBLIC_STATUS, status });
 export const setColorList = (list) => ({ type: SET_COLOR_LIST, list });
-export const toggleEditing = (value) => ({ type: TOGGLE_EDITING, value});
+export const toggleEditingBand = (value) => ({ type: TOGGLE_EDITING_BAND, value});
+export const toggleEditingMember = (value) => ({ type: TOGGLE_EDITING_MEMBER, value});
 
 /* -----------------   REDUCERS   ------------------ */
 
@@ -37,9 +43,11 @@ const initialState = {
 	newMembers: [],
 	newMemberName: '',
 	newMemberColor: '',
+	newMemberId: 0,
 	publicStatus: true,
 	colorList: [],
-	editing: false
+	editingMember: false,
+	editingBand: false
 };
 
 export default function reducer(prevState = initialState, action) {
@@ -52,6 +60,10 @@ export default function reducer(prevState = initialState, action) {
 			newState.newBand = action.band;
 			break;
 
+		case SET_NEW_BAND_NAME:
+			newState.newBandName = action.name;
+			break;
+
 		case SET_CURRENT_BAND_NAME:
 			newState.newBandName = action.bandName;
 			break;
@@ -62,6 +74,10 @@ export default function reducer(prevState = initialState, action) {
 
 		case SET_NEW_MEMBER_NAME:
 			newState.newMemberName = action.name;
+			break;
+
+		case SET_NEW_MEMBER_ID:
+			newState.newMemberId = action.id;
 			break;
 
 		case SET_NEW_MEMBERS:
@@ -80,8 +96,12 @@ export default function reducer(prevState = initialState, action) {
 			newState.colorList = action.list;
 			break;
 
-		case TOGGLE_EDITING:
-			newState.editing = action.value;
+		case TOGGLE_EDITING_BAND:
+			newState.editingBand = action.value;
+			break;
+
+		case TOGGLE_EDITING_MEMBER:
+			newState.editingMember = action.value;
 			break;
 
 		default:
@@ -131,12 +151,17 @@ export const loadColorList = () => (dispatch, getState) => {
 };
 
 export const addCustomMember = () => (dispatch, getState) => {
+	const newMembers = [...getState().creator.newMembers];
+	
+	// This id is only used when editing a member;
+	let id = getState().creator.newMemberId;
+	if (id === 0) id = `n${newMembers.length + 1}`;
+
 	const member = {
 		name: getState().creator.newMemberName,
 		color: getState().creator.newMemberColor,
+		id: id
 	};
-	const newMembers = [...getState().creator.newMembers];
-	const index = newMembers.findIndex(el => el.name === member.name);
 
 	// Assign random name, if member doesn't have one;
 	if (!member.name) {
@@ -150,11 +175,20 @@ export const addCustomMember = () => (dispatch, getState) => {
 	}
 
 	// Add or update to array
-	if (index === -1) newMembers.push(member);
-	else newMembers[index] = member;
-	loadColorList();
+	const editingMember = getState().creator.editingMember;
+
+	if (!editingMember) {
+		newMembers.push(member);
+	} else {
+		const index = newMembers.findIndex(el => el.id === member.id);
+		if (index) newMembers[index] = member;
+		else newMembers.push(member);
+	}
+
+	dispatch(loadColorList());
 	dispatch(setNewMemberName(''));
 	dispatch(setNewMemberColor(''));
+	dispatch(setNewMemberId(0));
 	dispatch(setNewMembers(newMembers));
 
 	if (getState().creator.newMembers.length === 20) {
@@ -164,13 +198,14 @@ export const addCustomMember = () => (dispatch, getState) => {
 	}
 
 	dispatch(loadColorList());
-	dispatch(toggleEditing(false));
+	dispatch(toggleEditingMember(false));
 };
 
 export const editCustomMember = (member) => (dispatch) => {
-	dispatch(toggleEditing(true));
+	dispatch(toggleEditingMember(true));
 	dispatch(setNewMemberName(member.name));
 	dispatch(setNewMemberColor(member.color));
+	dispatch(setNewMemberId(member.id));
 	dispatch(loadColorList());
 };
 
@@ -180,8 +215,9 @@ export const removeCustomMember = () => (dispatch, getState) => {
 	dispatch(setNewMembers(newMembersCopy));
 	dispatch(setNewMemberName(''));
 	dispatch(setNewMemberColor(''));
+	dispatch(setNewMemberId(0));
 	dispatch(loadColorList());
-	dispatch(toggleEditing(false));
+	dispatch(toggleEditingMember(false));
 };
 
 export const loadNewBand = () => (dispatch, getState) => {
@@ -213,10 +249,32 @@ export const addBand = () => (dispatch, getState) => {
 	};
 
 	return axios.post('/api/bands', bandToAdd)
-		.then(() => {
-			console.log('Band created');
+		.then((band) => {
+			console.log('Band created', band);
 			browserHistory.push('/myBands');
 		})
 		.catch(err => console.error(err));
 
+};
+
+export const updateBand = () => (dispatch, getState) => {
+	const bandId = getState().bands.currentBand.id;
+	const bandStatus = getState().creator.publicStatus;
+	const members = getState().creator.newMembers.map(m => {
+		if (isNaN(m.id)) delete m.id;
+		return m;
+	});
+	const bandToUpdate = {
+		status: bandStatus,
+		members: members
+	};
+
+	return axios.put(`/api/bands/${bandId}/update`, bandToUpdate)
+		.then((band) => {
+			console.log('Band updated', band);
+			dispatch(setNewBandName(''));
+			dispatch(setNewMembers([]));
+			browserHistory.push('/mybands');
+		})
+		.catch(err => console.error(err));
 };

@@ -9,7 +9,13 @@ module.exports = db => db.define('bands', {
 	},
 	public: {
 		type: Sequelize.BOOLEAN,
-		defaultValue: true
+		defaultValue: true,
+		allowNull: false,
+		set: function(value) {
+			if (value === true) value = true;
+			else value = false;
+			this.setDataValue('public', value);
+		}
 	}
 });
 
