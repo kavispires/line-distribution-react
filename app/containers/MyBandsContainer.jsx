@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 
 import MyBands from '../components/MyBands';
+
 import {
   deleteBand,
   editBand,

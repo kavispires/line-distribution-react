@@ -180,8 +180,6 @@ export const trackKeyDown = (key) => (dispatch, getState) => {
 	const index = members.findIndex(member => member.keyCode === key);
 	
 	if (index >= 0) dispatch(trackMouseDown(index, now));
-
-	console.log('DOWN:', key);
 };
 
 export const trackKeyUp = (key) => (dispatch, getState) => {
@@ -195,8 +193,6 @@ export const trackKeyUp = (key) => (dispatch, getState) => {
 	const index = members.findIndex(member => member.keyCode === key);
 	
 	if (index >= 0) dispatch(trackMouseUp(index, now));
-
-	console.log('UP:', event.keyCode);
 };
 
 export const resetDistribution = () => (dispatch, getState) => {
@@ -236,6 +232,11 @@ export const finishDistribution = () => (dispatch, getState) => {
 
 export const toggleHelp = () => (dispatch) => {
 
+};
+
+export const clearResults = () => (dispatch) => {
+	dispatch(toggleDistribute(true));
+	dispatch(setResults({}));
 };
 
 /* KEYBOARD INPUT WATCHERS */

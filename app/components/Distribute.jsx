@@ -3,7 +3,9 @@ import { Link } from 'react-router';
 
 import { getBoxSize, whosSinging } from '../utils';
 
-const Distribute = ({currentBand, currentSingers, log, members, mouseUp, mouseDown, finish, reset}) => {
+import ResultsComponent from './Results';
+
+const Distribute = ({currentBand, currentSingers, log, members, mouseUp, mouseDown, finish, reset, results, clearResults}) => {
 	
 	let boxSize = 0;
 	if (currentBand.id) {
@@ -17,6 +19,9 @@ const Distribute = ({currentBand, currentSingers, log, members, mouseUp, mouseDo
 		{
 			currentBand.id ? (
 				<div className="row-container">
+          {
+            results.length > 0 ? <ResultsComponent results={results} clearResults={clearResults} /> : null
+          }
           <h2>{currentBand.name} <span className="change-band"><Link to="/search">change?</Link></span></h2>
           <nav>
             <button className="btn" onClick={() => reset()}><span className="icon-refresh" /> <span className="desktop-only">Reset</span></button>
@@ -49,7 +54,7 @@ const Distribute = ({currentBand, currentSingers, log, members, mouseUp, mouseDo
           </div>
           <div className="log" data-bind="foreach: log">
             {
-              log.map((member, i) => <a key={`${member.name}-${i}`}>{member.name}<span className="tooltip">{member.duration} s</span></a>)
+              log.map((member, i) => <span key={`${member.name}-${i}`}>{member.name}<span className="tooltip">{member.duration} s</span></span>)
             }
           </div>
         </div>  

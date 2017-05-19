@@ -33174,6 +33174,10 @@ var _reactRouter = __webpack_require__(31);
 
 var _utils = __webpack_require__(90);
 
+var _Results = __webpack_require__(345);
+
+var _Results2 = _interopRequireDefault(_Results);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Distribute = function Distribute(_ref) {
@@ -33184,7 +33188,9 @@ var Distribute = function Distribute(_ref) {
       mouseUp = _ref.mouseUp,
       mouseDown = _ref.mouseDown,
       finish = _ref.finish,
-      reset = _ref.reset;
+      reset = _ref.reset,
+      results = _ref.results,
+      clearResults = _ref.clearResults;
 
 
   var boxSize = 0;
@@ -33200,6 +33206,7 @@ var Distribute = function Distribute(_ref) {
     currentBand.id ? _react2.default.createElement(
       'div',
       { className: 'row-container' },
+      results.length > 0 ? _react2.default.createElement(_Results2.default, { results: results, clearResults: clearResults }) : null,
       _react2.default.createElement(
         'h2',
         null,
@@ -33333,7 +33340,7 @@ var Distribute = function Distribute(_ref) {
         { className: 'log', 'data-bind': 'foreach: log' },
         log.map(function (member, i) {
           return _react2.default.createElement(
-            'a',
+            'span',
             { key: member.name + '-' + i },
             member.name,
             _react2.default.createElement(
@@ -34237,7 +34244,8 @@ var mapStateToProps = function mapStateToProps(state) {
     currentBand: state.bands.currentBand,
     currentSingers: state.distribution.currentSingers,
     log: state.distribution.log,
-    members: state.distribution.members
+    members: state.distribution.members,
+    results: state.distribution.results
   };
 };
 
@@ -34254,6 +34262,9 @@ var mapStateToDispatch = function mapStateToDispatch(dispatch) {
     },
     finish: function finish() {
       return dispatch((0, _distribution.finishDistribution)());
+    },
+    clearResults: function clearResults() {
+      return dispatch((0, _distribution.clearResults)());
     }
   };
 };
@@ -51829,7 +51840,7 @@ function symbolObservablePonyfill(root) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.toggleHelp = exports.finishDistribution = exports.decreaseLine = exports.removeLastLine = exports.resetDistribution = exports.trackKeyUp = exports.trackKeyDown = exports.trackMouseUp = exports.trackMouseDown = exports.setUpDistribution = exports.calculatePercentages = exports.toggleDistribute = exports.setResults = exports.setMembers = exports.setLog = exports.setLastKeyUp = exports.setLastKeyDown = exports.setCurrentSingers = undefined;
+exports.clearResults = exports.toggleHelp = exports.finishDistribution = exports.decreaseLine = exports.removeLastLine = exports.resetDistribution = exports.trackKeyUp = exports.trackKeyDown = exports.trackMouseUp = exports.trackMouseDown = exports.setUpDistribution = exports.calculatePercentages = exports.toggleDistribute = exports.setResults = exports.setMembers = exports.setLog = exports.setLastKeyUp = exports.setLastKeyDown = exports.setCurrentSingers = undefined;
 exports.default = reducer;
 
 var _axios = __webpack_require__(42);
@@ -52065,8 +52076,6 @@ var trackKeyDown = exports.trackKeyDown = function trackKeyDown(key) {
 		});
 
 		if (index >= 0) dispatch(trackMouseDown(index, now));
-
-		console.log('DOWN:', key);
 	};
 };
 
@@ -52084,8 +52093,6 @@ var trackKeyUp = exports.trackKeyUp = function trackKeyUp(key) {
 		});
 
 		if (index >= 0) dispatch(trackMouseUp(index, now));
-
-		console.log('UP:', event.keyCode);
 	};
 };
 
@@ -52138,6 +52145,13 @@ var toggleHelp = exports.toggleHelp = function toggleHelp() {
 	return function (dispatch) {};
 };
 
+var clearResults = exports.clearResults = function clearResults() {
+	return function (dispatch) {
+		dispatch(toggleDistribute(true));
+		dispatch(setResults({}));
+	};
+};
+
 /* KEYBOARD INPUT WATCHERS */
 
 var lastKeyDown = void 0;
@@ -52153,6 +52167,89 @@ document.body.addEventListener('keyup', function (event) {
 	_store2.default.dispatch(trackKeyUp(event.keyCode));
 	if (event.keyCode === lastKeyDown) lastKeyDown = null;
 });
+
+/***/ }),
+/* 345 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Results = function Results(_ref) {
+  var results = _ref.results,
+      clearResults = _ref.clearResults;
+
+  return _react2.default.createElement(
+    "div",
+    { className: "modal modal-results" },
+    _react2.default.createElement(
+      "div",
+      { className: "results" },
+      _react2.default.createElement(
+        "h3",
+        null,
+        "Results"
+      ),
+      _react2.default.createElement(
+        "div",
+        { className: "results-ranking" },
+        results.map(function (member, i) {
+          return _react2.default.createElement(
+            "div",
+            { className: "result", key: member.id },
+            _react2.default.createElement("div", { className: "result-bar w-" + member.relativePercentage + " color-" + member.color }),
+            _react2.default.createElement(
+              "div",
+              { className: "result-info" },
+              "#",
+              _react2.default.createElement(
+                "span",
+                { className: "position" },
+                i + 1
+              ),
+              " ",
+              _react2.default.createElement(
+                "span",
+                { className: "name" },
+                member.name
+              ),
+              " [ ",
+              _react2.default.createElement(
+                "span",
+                { className: "percentage" },
+                member.percentage
+              ),
+              "% ] [ ",
+              _react2.default.createElement(
+                "span",
+                { className: "timestamp" },
+                member.total
+              ),
+              "s ]"
+            )
+          );
+        })
+      ),
+      _react2.default.createElement(
+        "button",
+        { className: "btn", type: "button", onClick: clearResults },
+        "Close"
+      )
+    )
+  );
+};
+
+exports.default = Results;
 
 /***/ })
 /******/ ]);
