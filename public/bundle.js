@@ -52134,9 +52134,6 @@ var finishDistribution = exports.finishDistribution = function finishDistributio
 
 		var results = _lodash2.default.orderBy(members, ['total'], ['desc']);
 
-		results.forEach(function (m, i) {
-			return console.log('#' + (i + 1) + ' ' + m.name + ': ' + m.relativePercentage + '%');
-		});
 		dispatch(setResults(results));
 	};
 };

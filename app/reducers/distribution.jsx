@@ -226,7 +226,6 @@ export const finishDistribution = () => (dispatch, getState) => {
 
 	const results = _.orderBy(members, ['total'], ['desc']);
 
-	results.forEach((m, i) => console.log(`#${i + 1} ${m.name}: ${m.relativePercentage}%`));
 	dispatch(setResults(results));
 };
 
