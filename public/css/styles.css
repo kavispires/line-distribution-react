@@ -399,10 +399,10 @@ table {
   .distribute .log {
     padding: 5px;
     font-size: 80%; }
-    .distribute .log a {
+    .distribute .log span {
       position: relative;
       display: inline-block; }
-      .distribute .log a .tooltip {
+      .distribute .log span .tooltip {
         visibility: hidden;
         background-color: #FFFFFF;
         color: #222222;
@@ -417,14 +417,14 @@ table {
         bottom: 100%;
         left: 50%;
         margin-left: -30px; }
-      .distribute .log a:hover {
+      .distribute .log span:hover {
         text-decoration: underline;
         cursor: pointer; }
-        .distribute .log a:hover .tooltip {
+        .distribute .log span:hover .tooltip {
           visibility: visible; }
-      .distribute .log a:after {
+      .distribute .log span:after {
         content: ' | '; }
-      .distribute .log a:last-child:after {
+      .distribute .log span:last-child:after {
         content: ''; }
 
 /* PROGRESS */
@@ -1140,3 +1140,55 @@ table {
     .modal .modal-content .icon {
       font-size: 200%;
       color: #f4e775; }
+
+.results {
+  background: #EAEAEA;
+  padding: 20px;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  -ms-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+  width: 96%;
+  max-height: 92%;
+  overflow-y: hidden; }
+  .results h3 {
+    margin: 0 0 20px 0; }
+  .results .results-ranking {
+    overflow-y: auto;
+    max-height: 92%;
+    overflow-y: auto;
+    height: 68vh;
+    font-size: 80%; }
+  .results .result {
+    color: #222222;
+    margin: 5px;
+    text-align: left;
+    overflow-x: visible;
+    overflow-y: hidden;
+    white-space: nowrap;
+    max-height: 25px;
+    height: 100%;
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
+    .results .result .result-bar,
+    .results .result .result-info {
+      padding: 3px 10px;
+      position: relative;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
+    .results .result .result-bar {
+      width: 0.1px;
+      z-index: 300;
+      color: transparent !important; }
+    .results .result .result-info {
+      z-index: 301;
+      -ms-transform: translate(-100%);
+      -webkit-transform: translate(-100%);
+      transform: translate(0, -100%); }
+      .results .result .result-info .name {
+        font-weight: bold; }
