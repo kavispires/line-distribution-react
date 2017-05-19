@@ -6789,10 +6789,11 @@ var loadCurrentBand = exports.loadCurrentBand = function loadCurrentBand(bandId)
 			return res.data;
 		}).then(function (band) {
 			return dispatch(setCurrentBand(band));
+		}).then(function () {
+			return _reactRouter.browserHistory.push('/distribute');
 		}).catch(function (err) {
 			return console.error(err);
 		});
-		_reactRouter.browserHistory.push('/distribute');
 	};
 };
 
@@ -9982,6 +9983,10 @@ var getBoxSize = exports.getBoxSize = function getBoxSize(num) {
     else if (num % 3 === 0 && num < 10) return 'md'; // 3 cols
       else if (num % 2 === 0 && num < 5) return 'lg'; // 2 cols
         else if (num > 10 && num % 10 < num) return 'xs';else if (num % 3 < 2) return 'sm';else return 'md';
+};
+
+var whosSinging = exports.whosSinging = function whosSinging(arr) {
+  if (arr.length === 0) return '-';else if (arr.length === 1) return arr[0] + ' is singing.';else return arr.join(' and ') + ' are singing';
 };
 
 /***/ }),
@@ -32021,6 +32026,8 @@ var _creator = __webpack_require__(43);
 
 var _songs = __webpack_require__(184);
 
+var _distribution = __webpack_require__(344);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var onEnterProfile = function onEnterProfile(nextState, replace, done) {
@@ -32057,6 +32064,22 @@ var onEnterCreate = function onEnterCreate(nextState, replace, done) {
 	});
 };
 
+var onEnterDistribute = function onEnterDistribute(nextState, replace, done) {
+	_store2.default.dispatch((0, _auth.whoami)()).then(function () {
+		return _store2.default.dispatch((0, _distribution.toggleDistribute)(true));
+	}).then(function () {
+		return _store2.default.dispatch((0, _distribution.setUpDistribution)());
+	}).then(function () {
+		return _store2.default.dispatch((0, _distribution.setLog)([]));
+	})
+	// .then(() => store.dispatch(setCurrentSingers([])))
+	.then(function () {
+		return done();
+	}).catch(function (err) {
+		return console.error(err);
+	});
+};
+
 function Root() {
 	return _react2.default.createElement(
 		_reactRedux.Provider,
@@ -32072,7 +32095,7 @@ function Root() {
 				_react2.default.createElement(_reactRouter.Route, { path: '/profile', component: _ProfileContainer2.default, onEnter: onEnterProfile }),
 				_react2.default.createElement(_reactRouter.Route, { path: '/mybands', component: _MyBandsContainer2.default, onEnter: onEnterMyBands }),
 				_react2.default.createElement(_reactRouter.Route, { path: '/create', component: _CreateBandContainer2.default, onEnter: onEnterCreate }),
-				_react2.default.createElement(_reactRouter.Route, { path: '/distribute', component: _DistributeContainer2.default }),
+				_react2.default.createElement(_reactRouter.Route, { path: '/distribute', component: _DistributeContainer2.default, onEnter: onEnterDistribute }),
 				_react2.default.createElement(_reactRouter.Route, { path: '/search', component: _SearchContainer2.default })
 			),
 			_react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFound2.default })
@@ -33154,7 +33177,14 @@ var _utils = __webpack_require__(90);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Distribute = function Distribute(_ref) {
-  var currentBand = _ref.currentBand;
+  var currentBand = _ref.currentBand,
+      currentSingers = _ref.currentSingers,
+      log = _ref.log,
+      members = _ref.members,
+      mouseUp = _ref.mouseUp,
+      mouseDown = _ref.mouseDown,
+      finish = _ref.finish,
+      reset = _ref.reset;
 
 
   var boxSize = 0;
@@ -33162,7 +33192,7 @@ var Distribute = function Distribute(_ref) {
     boxSize = (0, _utils.getBoxSize)(currentBand.members.length);
   }
 
-  var boxCode = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+  var setCurrentSingers = (0, _utils.whosSinging)(currentSingers);
 
   return _react2.default.createElement(
     'section',
@@ -33191,7 +33221,7 @@ var Distribute = function Distribute(_ref) {
         _react2.default.createElement(
           'button',
           { className: 'btn', onClick: function onClick() {
-              return console.log('reset');
+              return reset();
             } },
           _react2.default.createElement('span', { className: 'icon-refresh' }),
           ' ',
@@ -33230,7 +33260,7 @@ var Distribute = function Distribute(_ref) {
         _react2.default.createElement(
           'button',
           { className: 'btn', onClick: function onClick() {
-              return console.log('finish');
+              return finish();
             } },
           _react2.default.createElement('span', { className: 'icon-complete' }),
           ' ',
@@ -33257,26 +33287,30 @@ var Distribute = function Distribute(_ref) {
       _react2.default.createElement(
         'h3',
         { className: 'who' },
-        'Nayeon is singing.'
+        setCurrentSingers
       ),
       _react2.default.createElement(
         'div',
         { className: 'progress' },
-        currentBand.members.map(function (member) {
-          _react2.default.createElement('span', { key: member.id, className: 'bar bar' + member.id + ' w-5 ' + member.color });
+        members.map(function (member) {
+          return _react2.default.createElement('span', { key: member.id, className: 'bar bar' + member.id + ' w-' + member.percentage + ' color-' + member.color });
         })
       ),
       _react2.default.createElement(
         'div',
         { className: 'boxes' },
-        currentBand.members.map(function (member, i) {
+        members.map(function (member, index) {
           return _react2.default.createElement(
             'div',
-            { key: member.id, className: 'box box0 box-' + boxSize + ' color-' + member.color },
+            { key: member.id, className: 'box box0 box-' + boxSize + ' color-' + member.color, onMouseDown: function onMouseDown() {
+                return mouseDown(index);
+              }, onMouseUp: function onMouseUp() {
+                return mouseUp(index);
+              } },
             _react2.default.createElement(
               'span',
               { className: 'box-key' },
-              boxCode[i]
+              member.keyFace
             ),
             _react2.default.createElement('br', null),
             _react2.default.createElement(
@@ -33288,7 +33322,8 @@ var Distribute = function Distribute(_ref) {
             _react2.default.createElement(
               'span',
               { className: 'timestamp' },
-              '0'
+              member.total,
+              ' s'
             )
           );
         })
@@ -33296,306 +33331,19 @@ var Distribute = function Distribute(_ref) {
       _react2.default.createElement(
         'div',
         { className: 'log', 'data-bind': 'foreach: log' },
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Sana'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Jihyo'
-        ),
-        _react2.default.createElement(
-          'a',
-          null,
-          'Nayeon'
-        )
+        log.map(function (member, i) {
+          return _react2.default.createElement(
+            'a',
+            { key: member.name + '-' + i },
+            member.name,
+            _react2.default.createElement(
+              'span',
+              { className: 'tooltip' },
+              member.duration,
+              ' s'
+            )
+          );
+        })
       )
     ) : _react2.default.createElement(
       'p',
@@ -34479,16 +34227,38 @@ var _Distribute = __webpack_require__(165);
 
 var _Distribute2 = _interopRequireDefault(_Distribute);
 
+var _distribution = __webpack_require__(344);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var mapState = function mapState(state) {
+var mapStateToProps = function mapStateToProps(state) {
   return {
     user: state.auth,
-    currentBand: state.bands.currentBand
+    currentBand: state.bands.currentBand,
+    currentSingers: state.distribution.currentSingers,
+    log: state.distribution.log,
+    members: state.distribution.members
   };
 };
 
-exports.default = (0, _reactRedux.connect)(mapState)(_Distribute2.default);
+var mapStateToDispatch = function mapStateToDispatch(dispatch) {
+  return {
+    mouseDown: function mouseDown(index) {
+      return dispatch((0, _distribution.trackMouseDown)(index));
+    },
+    mouseUp: function mouseUp(index) {
+      return dispatch((0, _distribution.trackMouseUp)(index));
+    },
+    reset: function reset() {
+      return dispatch((0, _distribution.resetDistribution)());
+    },
+    finish: function finish() {
+      return dispatch((0, _distribution.finishDistribution)());
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapStateToDispatch)(_Distribute2.default);
 
 /***/ }),
 /* 178 */
@@ -34660,7 +34430,9 @@ var rootReducer = (0, _redux.combineReducers)({
   app: __webpack_require__(34).default,
   auth: __webpack_require__(35).default,
   bands: __webpack_require__(55).default,
-  creator: __webpack_require__(43).default
+  creator: __webpack_require__(43).default,
+  distribution: __webpack_require__(344).default,
+  songs: __webpack_require__(184).default
 });
 
 exports.default = rootReducer;
@@ -52046,6 +51818,341 @@ function symbolObservablePonyfill(root) {
 
 	return result;
 };
+
+/***/ }),
+/* 344 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.toggleHelp = exports.finishDistribution = exports.decreaseLine = exports.removeLastLine = exports.resetDistribution = exports.trackKeyUp = exports.trackKeyDown = exports.trackMouseUp = exports.trackMouseDown = exports.setUpDistribution = exports.calculatePercentages = exports.toggleDistribute = exports.setResults = exports.setMembers = exports.setLog = exports.setLastKeyUp = exports.setLastKeyDown = exports.setCurrentSingers = undefined;
+exports.default = reducer;
+
+var _axios = __webpack_require__(42);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _store = __webpack_require__(185);
+
+var _store2 = _interopRequireDefault(_store);
+
+var _lodash = __webpack_require__(101);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* ------------------   ACTIONS   ------------------ */
+
+var SET_CURRENT_SINGERS = 'SET_CURRENT_SINGERS';
+var SET_LAST_KEY_DOWN = 'SET_LAST_KEY_DOWN';
+var SET_LAST_KEY_UP = 'SET_LAST_KEY_UP';
+var SET_LOG = 'SET_LOG';
+var SET_MEMBERS = 'SET_MEMBERS';
+var SET_RESULTS = 'SET_RESULTS';
+var TOGGLE_DISTRIBUTE = 'TOGGLE_DISTRIBUTE';
+
+/* --------------   ACTION CREATORS   -------------- */
+
+var setCurrentSingers = exports.setCurrentSingers = function setCurrentSingers(singers) {
+	return { type: SET_CURRENT_SINGERS, singers: singers };
+};
+var setLastKeyDown = exports.setLastKeyDown = function setLastKeyDown(key) {
+	return { type: SET_LAST_KEY_DOWN, key: key };
+};
+var setLastKeyUp = exports.setLastKeyUp = function setLastKeyUp(key) {
+	return { type: SET_LAST_KEY_UP, key: key };
+};
+var setLog = exports.setLog = function setLog(log) {
+	return { type: SET_LOG, log: log };
+};
+var setMembers = exports.setMembers = function setMembers(members) {
+	return { type: SET_MEMBERS, members: members };
+};
+var setResults = exports.setResults = function setResults(results) {
+	return { type: SET_RESULTS, results: results };
+};
+var toggleDistribute = exports.toggleDistribute = function toggleDistribute(value) {
+	return { type: TOGGLE_DISTRIBUTE, value: value };
+};
+
+/* -----------------   REDUCERS   ------------------ */
+
+var initialState = {
+	currentSingers: [],
+	distribute: false,
+	lastKeyDown: 0,
+	lastKeyUp: 0,
+	log: [],
+	members: [],
+	results: []
+};
+
+var Member = function Member(id, name, color, code, face) {
+	_classCallCheck(this, Member);
+
+	this.id = id;
+	this.name = name;
+	this.color = color;
+	this.keyCode = code;
+	this.keyFace = face;
+	this.boxStart = 0;
+	this.duration = 0;
+	this.total = 0;
+	this.percentage = 0;
+};
+
+function reducer() {
+	var prevState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+	var action = arguments[1];
+
+
+	var newState = Object.assign({}, prevState);
+
+	switch (action.type) {
+
+		case SET_CURRENT_SINGERS:
+			newState.currentSingers = action.singers;
+			break;
+
+		case SET_LAST_KEY_DOWN:
+			newState.lastKeyDown = action.key;
+			break;
+
+		case SET_LAST_KEY_UP:
+			newState.lastKeyUp = action.key;
+			break;
+
+		case SET_LOG:
+			newState.log = action.log;
+			break;
+
+		case SET_MEMBERS:
+			newState.members = action.members;
+			break;
+
+		case SET_RESULTS:
+			newState.results = action.results;
+			break;
+
+		case TOGGLE_DISTRIBUTE:
+			newState.distribute = action.value;
+			break;
+
+		default:
+			return prevState;
+
+	}
+
+	return newState;
+}
+
+/* ---------------   DISPATCHERS   ----------------- */
+
+var boxFace = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+var boxCode = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 81, 87, 69, 82, 84, 89, 85, 73, 79, 80];
+
+var deepCopy = function deepCopy(arrayOfObjects) {
+	return [].concat(_toConsumableArray(arrayOfObjects)).map(function (item) {
+		return Object.assign({}, item);
+	});
+};
+
+var calculatePercentages = exports.calculatePercentages = function calculatePercentages() {
+	return function (dispatch, getState) {
+		// Get total time and calculate percentual per member;
+		var members = deepCopy(getState().distribution.members);
+		var allMembersTotal = 0;
+		members.forEach(function (member) {
+			return allMembersTotal += member.total;
+		});
+		members.forEach(function (member) {
+			return member.percentage = Math.round(member.total * 100 / allMembersTotal);
+		});
+
+		dispatch(setMembers(members));
+	};
+};
+
+var setUpDistribution = exports.setUpDistribution = function setUpDistribution() {
+	return function (dispatch, getState) {
+		var currentBand = getState().bands.currentBand;
+
+		// Stop code if there's no currentBand
+		if (!currentBand.id) return;
+
+		var members = currentBand.members.map(function (mem, i) {
+			return new Member(mem.id, mem.name, mem.color, boxCode[i], boxFace[i]);
+		});
+
+		return dispatch(setMembers(members));
+	};
+};
+
+var trackMouseDown = exports.trackMouseDown = function trackMouseDown(index) {
+	var now = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Date.now();
+	return function (dispatch, getState) {
+		if (!getState().distribution.distribute) return;
+
+		// Deep copy members
+		var members = deepCopy(getState().distribution.members);
+		// Update boxStart
+		members[index].boxStart = now;
+
+		// Set who's singing
+		var currentSingers = [].concat(_toConsumableArray(getState().distribution.currentSingers));
+		currentSingers.unshift(members[index].name);
+
+		dispatch(setMembers(members));
+		dispatch(setCurrentSingers(currentSingers));
+	};
+};
+
+var trackMouseUp = exports.trackMouseUp = function trackMouseUp(index) {
+	var now = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Date.now();
+	return function (dispatch, getState) {
+		if (!getState().distribution.distribute) return;
+
+		// Deep copy members
+		var members = deepCopy(getState().distribution.members);
+		// Calculate duration
+		var duration = Number(((now - members[index].boxStart) / 1000).toFixed(2));
+		// Add to Duration/Total
+		members[index].duration = duration;
+		members[index].total += duration;
+		members[index].boxStart = 0;
+
+		dispatch(setMembers(members));
+
+		// Add log
+		var log = [].concat(_toConsumableArray(getState().distribution.log)).map(function (l) {
+			return Object.assign({}, l);
+		});
+		log.push({ name: members[index].name, duration: duration });
+
+		dispatch(setLog(log));
+
+		// Update Who's Singing
+		var currentSingers = [].concat(_toConsumableArray(getState().distribution.currentSingers));
+		var whoIndex = currentSingers.indexOf(members[index].name);
+		currentSingers.splice(whoIndex, 1);
+
+		dispatch(setCurrentSingers(currentSingers));
+
+		dispatch(calculatePercentages());
+	};
+};
+
+var trackKeyDown = exports.trackKeyDown = function trackKeyDown(key) {
+	return function (dispatch, getState) {
+		if (!getState().distribution.distribute) return;
+
+		// Set end time
+		var now = Date.now();
+
+		var members = getState().distribution.members;
+
+		var index = members.findIndex(function (member) {
+			return member.keyCode === key;
+		});
+
+		if (index >= 0) dispatch(trackMouseDown(index, now));
+
+		console.log('DOWN:', key);
+	};
+};
+
+var trackKeyUp = exports.trackKeyUp = function trackKeyUp(key) {
+	return function (dispatch, getState) {
+		if (!getState().distribution.distribute) return;
+
+		// Set end time
+		var now = Date.now();
+
+		var members = getState().distribution.members;
+
+		var index = members.findIndex(function (member) {
+			return member.keyCode === key;
+		});
+
+		if (index >= 0) dispatch(trackMouseUp(index, now));
+
+		console.log('UP:', event.keyCode);
+	};
+};
+
+var resetDistribution = exports.resetDistribution = function resetDistribution() {
+	return function (dispatch, getState) {
+		dispatch(setLog([]));
+		// Deep copy members
+		var members = deepCopy(getState().distribution.members).map(function (member) {
+			member.duration = 0;
+			member.total = 0;
+			member.percentage = 0;
+			return member;
+		});
+		dispatch(setMembers(members));
+	};
+};
+
+var removeLastLine = exports.removeLastLine = function removeLastLine() {
+	return function (dispatch) {};
+};
+
+var decreaseLine = exports.decreaseLine = function decreaseLine() {
+	return function (dispatch) {};
+};
+
+var finishDistribution = exports.finishDistribution = function finishDistribution() {
+	return function (dispatch, getState) {
+		dispatch(toggleDistribute(false));
+
+		var members = deepCopy(getState().distribution.members);
+
+		var maxPercentage = Math.max.apply(Math, members.map(function (m) {
+			return m.percentage;
+		}));
+
+		members.forEach(function (member) {
+			return member.relativePercentage = Math.round(member.percentage * 100 / maxPercentage);
+		});
+
+		var results = _lodash2.default.orderBy(members, ['total'], ['desc']);
+
+		results.forEach(function (m, i) {
+			return console.log('#' + (i + 1) + ' ' + m.name + ': ' + m.relativePercentage + '%');
+		});
+		dispatch(setResults(results));
+	};
+};
+
+var toggleHelp = exports.toggleHelp = function toggleHelp() {
+	return function (dispatch) {};
+};
+
+/* KEYBOARD INPUT WATCHERS */
+
+var lastKeyDown = void 0;
+
+document.body.addEventListener('keydown', function (event) {
+	if (event.keyCode !== lastKeyDown) {
+		_store2.default.dispatch(trackKeyDown(event.keyCode));
+		lastKeyDown = event.keyCode;
+	}
+});
+
+document.body.addEventListener('keyup', function (event) {
+	_store2.default.dispatch(trackKeyUp(event.keyCode));
+	if (event.keyCode === lastKeyDown) lastKeyDown = null;
+});
 
 /***/ })
 /******/ ]);

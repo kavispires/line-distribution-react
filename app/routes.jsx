@@ -14,10 +14,11 @@ import SearchContainer from './containers/SearchContainer';
 
 import NotFound from './components/NotFound';
 
-import {whoami} from './reducers/auth';
-import {loadBands, loadFavoriteBands, loadAllBands} from './reducers/bands';
-import {loadColorList} from './reducers/creator';
-import {loadSongs} from './reducers/songs';
+import { whoami} from './reducers/auth';
+import { loadAllBands, loadBands, loadFavoriteBands } from './reducers/bands';
+import { loadColorList } from './reducers/creator';
+import { loadSongs } from './reducers/songs';
+import { setCurrentSingers, setLog, setUpDistribution, toggleDistribute } from './reducers/distribution';
 
 const onEnterProfile = (nextState, replace, done) => {
 	store.dispatch(whoami())
@@ -42,6 +43,16 @@ const onEnterCreate = (nextState, replace, done) => {
 		.catch(err => console.error(err));
 };
 
+const onEnterDistribute = (nextState, replace, done) => {
+	store.dispatch(whoami())
+		.then(() => store.dispatch(toggleDistribute(true)))
+		.then(() => store.dispatch(setUpDistribution()))
+		.then(() => store.dispatch(setLog([])))
+		// .then(() => store.dispatch(setCurrentSingers([])))
+		.then(() => done())
+		.catch(err => console.error(err));
+};
+
 export default function Root () {
 	return (
 		<Provider store={store}>
@@ -52,7 +63,7 @@ export default function Root () {
 	        <Route path="/profile" component={ProfileContainer} onEnter={onEnterProfile} />
 	        <Route path="/mybands" component={MyBandsContainer} onEnter={onEnterMyBands} />
         	<Route path="/create" component={CreateBandContainer} onEnter={onEnterCreate} />
-	        <Route path="/distribute" component={DistributeContainer} />
+	        <Route path="/distribute" component={DistributeContainer} onEnter={onEnterDistribute} />
 	        <Route path="/search" component={SearchContainer} />
 	      </Route>
 	      <Route path="*" component={NotFound} />

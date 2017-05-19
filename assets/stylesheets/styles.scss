@@ -426,7 +426,7 @@ table {
     background-color: $negative;
     font-size: 90%;
     border: 1px solid $negative-medium;
-    @include border-radius(3px);   
+    @include border-radius(3px);
   }
 
   .log {
@@ -434,15 +434,33 @@ table {
     font-size: 80%;
     @extend .who;
     a {
+      position: relative;
+      display: inline-block;
+
+      .tooltip {
+        visibility: hidden;
+        background-color: $white;
+        color: $primary;
+        text-align: center;
+        padding: 5px;
+        @include border-radius(3px);
+        position: absolute;
+        z-index: 10;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -30px;
+      }
+
       &:hover {
         text-decoration: underline;
         cursor: pointer;
-      }
-      &:before {
-        content: ' ';
+
+        .tooltip {
+          visibility: visible;
+        }
       }
       &:after {
-        content: ' |';
+        content: ' | ';
       }
       &:last-child:after {
         content: '';
@@ -468,12 +486,15 @@ table {
     float: left;
     width: 0px;
     height: 20px;
+    -webkit-transition: width 2s, height 4s; /* Safari */
   }
 }
 
 @for $i from 1 through 100 {
   .w-#{$i} { 
     width: $i * 1% !important;
+    -webkit-transition: width 2s, height 4s; /* Safari */
+    transition: width 1s;
   }
 }
 
@@ -493,9 +514,16 @@ table {
   @include border-radius(10px);
   color: #000;
   font-size: 1.5em;
-  cursor: pointer;
+  cursor: pointer !important;
 
   font-size: 90%;
+
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
 }
 
 .box-key {

@@ -12,3 +12,9 @@ export const getBoxSize = (num) => {
   else if (num % 3 < 2) return 'sm';
   else return 'md';
 };
+
+export const whosSinging = (arr) => {
+	if (arr.length === 0) return '-';
+	else if (arr.length === 1) return `${arr[0]} is singing.`;
+	else return `${arr.join(' and ')} are singing`;
+};
