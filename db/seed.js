@@ -79,7 +79,7 @@ const members = seed(Member, {
   Kyuhyun: {name: 'Kyuhyun', color: 'grey', band_id: 4},
   Jisoo: {name: 'Jisoo', color: 'forest', band_id: 5},
   Jennie: {name: 'Jennie', color: 'blue', band_id: 5},
-  Rose: {name: 'Rosé', color: 'hotpink', band_id: 5},
+  Rose: {name: 'Rosé', color: 'hotPink', band_id: 5},
   Lisa: {name: 'Lisa', color: 'purple', band_id: 5},
   Nadine: {name: 'Nadine', color: 'orange', band_id: 6},
   cheryl: {name: 'Cheryl', color: 'red', band_id: 6},

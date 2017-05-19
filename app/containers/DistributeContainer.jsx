@@ -2,11 +2,33 @@ import { connect } from 'react-redux';
 
 import Distribute from '../components/Distribute';
 
-const mapState = (state) => {
+import {
+	clearResults,
+  trackMouseDown,
+  trackMouseUp,
+  resetDistribution,
+  finishDistribution
+} from '../reducers/distribution';
+
+const mapStateToProps = (state) => {
   return {
     user: state.auth,
-    currentBand: state.bands.currentBand
+    currentBand: state.bands.currentBand,
+    currentSingers: state.distribution.currentSingers,
+    log: state.distribution.log,
+    members: state.distribution.members,
+    results: state.distribution.results
   };
 };
 
-export default connect(mapState)(Distribute);
+const mapStateToDispatch = (dispatch) => {
+	return {
+		mouseDown: (index) => dispatch(trackMouseDown(index)),
+		mouseUp: (index) => dispatch(trackMouseUp(index)),
+		reset: () => dispatch(resetDistribution()),
+		finish: () => dispatch(finishDistribution()),
+		clearResults: () => dispatch(clearResults())
+	};
+};
+
+export default connect(mapStateToProps, mapStateToDispatch)(Distribute);

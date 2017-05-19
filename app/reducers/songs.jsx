@@ -17,7 +17,7 @@ const setCurrentSong = (song) => ({ type: SET_CURRENT_SONG, song });
 const initialState = {
 	allSongs: [],
 	mySongs: [],
-	currentSong: {}
+	currentSong: {},
 };
 
 export default function reducer(prevState = initialState, action) {

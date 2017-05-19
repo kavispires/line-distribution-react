@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 
 import CreateBand from '../components/CreateBand';
+
 import {
     addBand,
     addCustomMember,
@@ -33,7 +34,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-	return {
+  return {
     checkBandName: (event) => dispatch(checkBandName(event.target.value)),
     handleBandName: (event) => dispatch(handleBandName(event.target.value)),
     handleMemberName: (event) => dispatch(setNewMemberName(event.target.value)),
@@ -41,10 +42,10 @@ const mapDispatchToProps = (dispatch) => {
     addCustomMember: () => dispatch(addCustomMember()),
     editCustomMember: (member) => dispatch(editCustomMember(member)),
     removeCustomMember: () => dispatch(removeCustomMember()),
-	handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
+    handlePublicStatus: (event) => dispatch(handlePublicStatus(event.target.value)),
     handleSubmit: () => dispatch(addBand()),
     handleUpdate: () => dispatch(updateBand())
-	};
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateBand);

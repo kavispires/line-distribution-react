@@ -89,8 +89,8 @@ export const loadCurrentBand = (bandId) => (dispatch) => {
 	axios.get(`api/bands/${bandId}`)
 		.then(res => res.data)
 		.then(band => dispatch(setCurrentBand(band)))
+		.then(() => browserHistory.push(`/distribute`))
 		.catch(err => console.error(err));
-	browserHistory.push(`/distribute`);
 };
 
 export const handleCreateBandClick = () => (dispatch) => {
